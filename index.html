@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Arkad · Controle Financeiro</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0E2A21">
+<meta name="background-color" content="#0E2A21">
+<meta name="description" content="Arkad — controle financeiro pessoal, mês a mês.">
+
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Arkad">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-950:#0E2A21;
+    --ink-900:#123027;
+    --ink-800:#183A2F;
+    --paper-50:#FBF7EC;
+    --paper-100:#F1E9D8;
+    --paper-200:#E7DCC3;
+    --brass-500:#B8922F;
+    --brass-300:#D8B95F;
+    --receita-600:#2F6F4E;
+    --receita-100:#DCEBE1;
+    --despesa-600:#9C3B2A;
+    --despesa-100:#F2DFD9;
+    --neutral-600:#3B5166;
+    --neutral-100:#DFE5EA;
+    --divida-600:#6B4A9C;
+    --divida-100:#E6DEF0;
+    --text-900:#1B1B18;
+    --text-600:#5B564A;
+    --line: rgba(27,27,24,0.14);
+    --line-strong: rgba(27,27,24,0.28);
+    --radius: 3px;
+    --shadow-card: 0 1px 2px rgba(14,42,33,0.06), 0 6px 16px rgba(14,42,33,0.07);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--ink-950);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(184,146,47,0.10), transparent 45%),
+      radial-gradient(circle at 85% 100%, rgba(184,146,47,0.08), transparent 40%);
+    font-family:'Inter', system-ui, sans-serif;
+    color:var(--text-900);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Zilla Slab', Georgia, serif; margin:0;}
+  .num{font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums;}
+
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:20px;
+    padding:18px 28px;
+    border-bottom:1px solid rgba(184,146,47,0.35);
+    flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:40px; height:40px; border-radius:50%;
+    border:1.5px solid var(--brass-300);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Zilla Slab', serif; font-weight:700; font-size:18px; letter-spacing:0.3px;
+    color:var(--brass-300);
+  }
+  .brand-text h1{color:var(--paper-50); font-size:22px; font-weight:700; letter-spacing:0.3px;}
+  .brand-text p{color:var(--brass-300); font-size:11.5px; text-transform:uppercase; letter-spacing:1.6px; margin-top:2px;}
+
+  .month-tabs{
+    display:flex; align-items:flex-end; gap:2px; flex:1; overflow-x:auto;
+    padding-bottom:0;
+  }
+  .month-tab{
+    background:rgba(241,233,216,0.06);
+    border:1px solid rgba(184,146,47,0.3);
+    border-bottom:none;
+    color:var(--brass-300);
+    padding:9px 16px 8px;
+    font-size:13px; font-weight:600;
+    border-radius:6px 6px 0 0;
+    white-space:nowrap;
+    display:flex; align-items:center; gap:8px;
+  }
+  .month-tab.active{
+    background:var(--paper-100);
+    color:var(--ink-950);
+    border-color:var(--paper-100);
+  }
+  .month-tab .del-month{
+    opacity:0; transition:opacity .15s; font-size:13px; line-height:1; color:var(--despesa-600);
+    background:none; border:none; padding:0 0 0 2px;
+  }
+  .month-tab.active .del-month{opacity:.55;}
+  .month-tab.active .del-month:hover{opacity:1;}
+
+  .topbar-actions{display:flex; align-items:center; gap:10px;}
+  .btn-ghost{
+    background:transparent; border:1px solid rgba(184,146,47,0.5);
+    color:var(--brass-300); padding:9px 14px; border-radius:6px; font-size:13px; font-weight:600;
+  }
+  .btn-ghost:hover{background:rgba(184,146,47,0.12);}
+
+  .backup-menu{position:relative;}
+  .btn-icon{
+    background:transparent; border:1px solid rgba(184,146,47,0.5); color:var(--brass-300);
+    width:34px; height:34px; border-radius:6px; font-size:16px;
+  }
+  .backup-dropdown{
+    display:none; position:absolute; right:0; top:42px; background:var(--paper-50);
+    border:1px solid var(--line-strong); border-radius:8px; box-shadow:var(--shadow-card);
+    min-width:250px; padding:6px; z-index:40;
+  }
+  .backup-dropdown.open{display:block;}
+  .backup-dropdown button, .backup-dropdown .file-btn{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    padding:9px 10px; font-size:13px; border-radius:5px; color:var(--text-900);
+  }
+  .backup-dropdown button:hover, .backup-dropdown .file-btn:hover{background:var(--paper-200);}
+
+  /* ---------- main ledger ---------- */
+  .ledger{ max-width:1180px; margin:0 auto; padding:26px 20px 90px; }
+
+  /* ---------- summary ---------- */
+  .summary{
+    display:grid; grid-template-columns: repeat(4, 1fr);
+    gap:14px; margin-bottom:14px; align-items:stretch;
+  }
+  .sum-card{
+    background:var(--paper-50); border:1px solid var(--line); border-radius:8px;
+    padding:16px 16px 14px; box-shadow:var(--shadow-card);
+    position:relative; overflow:hidden;
+  }
+  .sum-card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  }
+  .sum-card.receitas::before{background:var(--receita-600);}
+  .sum-card.despesas::before{background:var(--despesa-600);}
+  .sum-card.investimentos::before{background:var(--neutral-600);}
+  .sum-card.dividas::before{background:var(--divida-600);}
+  .sum-eyebrow{font-size:10.5px; text-transform:uppercase; letter-spacing:1.4px; color:var(--text-600); font-weight:600;}
+  .sum-value{font-size:21px; font-weight:600; margin-top:6px;}
+  .sum-sub{font-size:11.5px; color:var(--text-600); margin-top:3px;}
+  .sum-sub .num{font-size:11.5px;}
+  .progress-track{height:5px; background:var(--paper-200); border-radius:3px; margin-top:10px; overflow:hidden;}
+  .progress-fill{height:100%; border-radius:3px;}
+  .receitas .progress-fill{background:var(--receita-600);}
+  .despesas .progress-fill{background:var(--despesa-600);}
+  .investimentos .progress-fill{background:var(--neutral-600);}
+  .dividas .progress-fill{background:var(--divida-600);}
+
+  /* ---------- trend chart ---------- */
+  .trend-card{
+    background:var(--paper-50); border:1px solid var(--line); border-radius:8px;
+    padding:16px 18px 12px; margin-bottom:22px; box-shadow:var(--shadow-card);
+  }
+  .trend-head{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    margin-bottom:6px;
+  }
+  .trend-head h2{font-size:16.5px; font-weight:600;}
+  .trend-legend{display:flex; gap:16px; flex-wrap:wrap;}
+  .legend-item{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-600); font-weight:600;}
+  .legend-dot{width:9px; height:9px; border-radius:50%; flex:none;}
+  .trend-svg-wrap{width:100%; overflow-x:auto;}
+  .trend-svg-wrap svg{display:block; min-width:100%;}
+  .trend-pt{transition:r .12s;}
+  .trend-pt:hover{r:5.5;}
+  .trend-empty{padding:26px 10px; text-align:center; color:var(--text-600); font-size:12.5px; font-style:italic;}
+  .trend-axis-label{font-family:'Inter', sans-serif; font-size:10px; fill:var(--text-600);}
+  .trend-val-label{font-family:'IBM Plex Mono', monospace; font-size:9.5px; fill:var(--text-600);}
+
+  /* ---------- sheets ---------- */
+  .sheet{
+    background:var(--paper-50);
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin-bottom:22px;
+    box-shadow:var(--shadow-card);
+    overflow:hidden;
+  }
+  .sheet-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--line-strong);
+    background:linear-gradient(180deg, rgba(184,146,47,0.07), transparent);
+  }
+  .sheet-head h2{font-size:16.5px; font-weight:600; letter-spacing:0.2px;}
+  .sheet-head .tag{
+    font-size:10px; text-transform:uppercase; letter-spacing:1.2px; font-weight:700;
+    padding:3px 8px; border-radius:20px; margin-left:9px; vertical-align:middle;
+  }
+  .receitas-tag{background:var(--receita-100); color:var(--receita-600);}
+  .despesas-tag{background:var(--despesa-100); color:var(--despesa-600);}
+  .impostos-tag{background:var(--despesa-100); color:var(--despesa-600);}
+  .investimentos-tag{background:var(--neutral-100); color:var(--neutral-600);}
+  .dividas-tag{background:var(--divida-100); color:var(--divida-600);}
+
+  .sheet-totals{font-size:12.5px; color:var(--text-600); display:flex; gap:16px;}
+  .sheet-totals b{color:var(--text-900);}
+
+  table{width:100%; border-collapse:collapse;}
+  thead th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:1px;
+    color:var(--text-600); font-weight:600; padding:8px 18px; border-bottom:1px solid var(--line-strong);
+    background:repeating-linear-gradient(180deg, transparent, transparent 100%);
+  }
+  thead th.col-val{text-align:right; width:150px;}
+  thead th.col-act{width:40px;}
+  tbody tr{border-bottom:1px dashed var(--line);}
+  tbody tr:hover{background:rgba(184,146,47,0.05);}
+  td{padding:6px 18px; vertical-align:middle;}
+  td.col-act{text-align:center;}
+
+  .cell-input{
+    width:100%; border:none; background:transparent; font-family:inherit;
+    font-size:13.5px; padding:6px 4px; border-radius:4px; color:var(--text-900);
+  }
+  .cell-input:focus{outline:none; background:var(--paper-200);}
+  .cell-input.num{text-align:right; font-size:13px;}
+  .cell-input.name-input{font-weight:500;}
+
+  .delta{font-size:11px; margin-top:1px;}
+  .delta.good{color:var(--receita-600);}
+  .delta.bad{color:var(--despesa-600);}
+
+  .btn-del{
+    background:none; border:none; color:var(--text-600); font-size:15px; line-height:1;
+    padding:4px 6px; border-radius:4px;
+  }
+  .btn-del:hover{color:var(--despesa-600); background:var(--despesa-100);}
+
+  .row-add{
+    display:flex; align-items:center; padding:10px 18px; gap:8px;
+  }
+  .btn-add{
+    background:none; border:1px dashed var(--line-strong); color:var(--text-600);
+    font-size:12.5px; font-weight:600; padding:7px 12px; border-radius:6px; width:100%; text-align:left;
+  }
+  .btn-add:hover{border-color:var(--brass-500); color:var(--brass-500); background:rgba(184,146,47,0.06);}
+
+  .empty-row td{padding:16px 18px; color:var(--text-600); font-size:12.5px; font-style:italic;}
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(14,42,33,0.55); backdrop-filter:blur(2px);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--paper-50); border-radius:10px; padding:24px; width:100%; max-width:380px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  }
+  .modal h3{font-size:17px; margin-bottom:16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-600); margin-bottom:5px; font-weight:600;}
+  .field select, .field input[type=number], .field input[type=text]{
+    width:100%; padding:9px 10px; border:1px solid var(--line-strong); border-radius:6px;
+    font-family:inherit; font-size:14px; background:var(--paper-100);
+  }
+  .field-check{display:flex; align-items:center; gap:8px; font-size:13px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:18px;}
+  .btn-primary{
+    background:var(--ink-950); color:var(--paper-50); border:none; padding:10px 16px;
+    border-radius:6px; font-size:13px; font-weight:600;
+  }
+  .btn-primary:hover{background:var(--ink-800);}
+  .btn-secondary{
+    background:none; border:1px solid var(--line-strong); padding:10px 16px; border-radius:6px;
+    font-size:13px; font-weight:600; color:var(--text-900);
+  }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink-950); color:var(--paper-50); padding:9px 18px; border-radius:20px;
+    font-size:12.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s;
+    border:1px solid rgba(184,146,47,0.4);
+    display:flex; align-items:center; gap:7px;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast .dot{width:6px; height:6px; border-radius:50%; background:var(--brass-300);}
+
+  @media(max-width:760px){
+    .summary{grid-template-columns:1fr 1fr;}
+    .stamp-wrap{grid-column:1/-1;}
+    .topbar{padding:14px 16px;}
+    .ledger{padding:18px 12px 90px;}
+    thead th, td{padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">A</span>
+      <div class="brand-text">
+        <h1>Arkad</h1>
+        <p>Controle financeiro pessoal</p>
+      </div>
+    </div>
+    <nav class="month-tabs" id="monthTabs"></nav>
+    <div class="topbar-actions">
+      <button class="btn-ghost" id="btnNewMonth">+ novo mês</button>
+      <div class="backup-menu">
+        <button class="btn-icon" id="btnBackupToggle" title="Backup e restauração">⋮</button>
+        <div class="backup-dropdown" id="backupDropdown">
+          <button id="btnExport">⭳ Baixar backup (.json)</button>
+          <label class="file-btn">⭱ Importar backup
+            <input type="file" id="importFile" accept="application/json" hidden>
+          </label>
+          <button id="btnRestoreSeed">↺ Restaurar dados originais de Jun/26</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="ledger">
+    <section class="summary" id="summary"></section>
+    <section class="trend-card" id="trendCard"></section>
+    <div id="sheets"></div>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3>Novo mês</h3>
+      <div class="field">
+        <label for="selMes">Mês</label>
+        <select id="selMes">
+          <option value="01">Janeiro</option><option value="02">Fevereiro</option>
+          <option value="03">Março</option><option value="04">Abril</option>
+          <option value="05">Maio</option><option value="06">Junho</option>
+          <option value="07">Julho</option><option value="08">Agosto</option>
+          <option value="09">Setembro</option><option value="10">Outubro</option>
+          <option value="11">Novembro</option><option value="12">Dezembro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="inpAno">Ano</label>
+        <input type="number" id="inpAno" value="2026" min="2000" max="2100">
+      </div>
+      <div class="field field-check">
+        <input type="checkbox" id="chkCopiar" checked>
+        <label for="chkCopiar" style="margin:0; text-transform:none; letter-spacing:0; font-weight:400;">Copiar itens do mês atual (zerando o realizado)</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelModal">Cancelar</button>
+        <button class="btn-primary" id="btnConfirmModal">Criar mês</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Salvo</span></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "arkadDB_v1";
+  var LEGACY_STORAGE_KEY = "livroCaixaDB_v1";
+
+  var SECTIONS = [
+    {key:"receitas",       title:"Receitas",       tagClass:"receitas-tag",       cardClass:"receitas",       sign:"+"},
+    {key:"despesas",       title:"Despesas",       tagClass:"despesas-tag",       cardClass:"despesas",       sign:"-"},
+    {key:"impostos",       title:"Impostos e descontos", tagClass:"impostos-tag", cardClass:null,             sign:"-"},
+    {key:"investimentos",  title:"Investimentos",  tagClass:"investimentos-tag",  cardClass:"investimentos",  sign:"-"},
+    {key:"dividas",        title:"Dívidas",        tagClass:"dividas-tag",        cardClass:"dividas",        sign:"-"}
+  ];
+
+  function uid(p){
+    return (p||"i") + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  function item(nome, orcado, realizado){
+    return {id: uid("it"), nome: nome, orcado: orcado||0, realizado: realizado||0};
+  }
+
+  function seedJunho26(){
+    var m = {};
+    m["2026-06"] = {
+      label: "Junho/26",
+      receitas: [
+        item("Repasse Volpe Games",0,0), item("Mercado Afiliados",0,0), item("Lotoni",0,0),
+        item("Robo Trader Do Bem",0,0), item("Investimentos B3",0,0),
+        item("Trabalho Farmacia",2624.20,2791.45),
+        item("Provisionado Pote do Sonhos",0,0),
+        item("Vale Alimentação",200,200),
+        item("Provisionado Pote de Ouro",0,0),
+        item("Mesa Prop",0,0), item("Ticket Raia",100,100), item("Venda OLX",0,0),
+        item("Repasse Pai e Mãe",0,0), item("Uber (recebido)",0,0), item("Mileto Robo",0,0),
+        item("Saldo Mês Anterior",0,0), item("Dinheiro",0,0)
+      ],
+      despesas: [
+        item("Victor Happiness",400,0), item("Carga de Celular",49.9,52.30),
+        item("Academia - Gympass",69.99,0), item("Uber",100,46.28),
+        item("Compras Mercado - $",200,200), item("Compra Mercado - Vale",0,0),
+        item("Hospedagem",0,0), item("Trader do Bem - Infra",49.9,0),
+        item("AWS",83.66,0), item("Clube iFood",5.95,0), item("Google iCloud",9.9,0),
+        item("Swile Gasto - Mercado",0,0), item("Aluguel Gabi",670,0),
+        item("Luz Gabi",196,179.69), item("Água",25,86.96),
+        item("Compras débito em folha",100,0), item("Bomba Gabi Itaú",0,0),
+        item("Neon",408.34,408.34), item("It Fashion cartão",89.67,89.67),
+        item("Reserva",0,334.90)
+      ],
+      impostos: [
+        item("INSS mês (8,62%)",226.35,226.91), item("Sindicato",26.24,26.24),
+        item("Vale Refeição",40,40), item("Vale Transporte",78.73,78.73)
+      ],
+      investimentos: [
+        item("Pote de Ouro (10%)",0,0), item("Reserva (10%)",0,0),
+        item("Robo Trader do Bem - Pote dos Sonhos (10%)",0,0),
+        item("Caridade",0,0), item("Robo Trader do Bem",0,0)
+      ],
+      dividas: [
+        item("PDA 2/12",0,0), item("Neon",0,0), item("Itaú",0,0),
+        item("Mercado Pago - Crédito",0,0),
+        item("Bomba ADV Gabi - Mercado Pago (2/12)",248.26,0),
+        item("Bomba ADV Gabi - Itaú (1/12)",270.15,0),
+        item("Celular 3/12 (Itaú)",0,0)
+      ]
+    };
+    return m;
+  }
+
+  function emptyMonth(label){
+    return {label:label, receitas:[], despesas:[], impostos:[], investimentos:[], dividas:[]};
+  }
+
+  function cloneMonthCarry(src, label){
+    var out = emptyMonth(label);
+    SECTIONS.forEach(function(s){
+      out[s.key] = (src[s.key]||[]).map(function(it){
+        return {id: uid("it"), nome: it.nome, orcado: it.orcado, realizado: 0};
+      });
+    });
+    return out;
+  }
+
+  function loadDB(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){
+        raw = localStorage.getItem(LEGACY_STORAGE_KEY); // migração do nome antigo do app
+      }
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(parsed && parsed.meses && Object.keys(parsed.meses).length){
+          return parsed;
+        }
+      }
+    }catch(e){ console.warn("Falha ao ler localStorage, recriando dados.", e); }
+    var db = {meses: seedJunho26()};
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    return db;
+  }
+
+  var db = loadDB();
+  var activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
+
+  function saveDB(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    showToast("Salvo");
+  }
+
+  var toastTimer = null;
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    document.getElementById("toastMsg").textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1400);
+  }
+
+  function brl(n){
+    n = Number(n)||0;
+    return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  }
+
+  function parseNum(str){
+    if(typeof str === "number") return str;
+    if(!str) return 0;
+    var s = String(str).trim();
+    s = s.replace(/[^0-9,.\-]/g, "");
+    if(s.indexOf(",") > -1 && s.indexOf(".") > -1){
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else if(s.indexOf(",") > -1){
+      s = s.replace(",", ".");
+    }
+    var v = parseFloat(s);
+    return isNaN(v) ? 0 : v;
+  }
+
+  function monthLabelFromKey(key){
+    var names = ["","Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    var parts = key.split("-");
+    var y = parts[0], m = parseInt(parts[1],10);
+    return names[m] + "/" + y.slice(2);
+  }
+
+  function sumSection(monthData, key){
+    var arr = monthData[key] || [];
+    var o = 0, r = 0;
+    arr.forEach(function(it){ o += Number(it.orcado)||0; r += Number(it.realizado)||0; });
+    return {orcado:o, realizado:r};
+  }
+
+  function computeTotals(monthData){
+    var receitas = sumSection(monthData, "receitas");
+    var despesasBase = sumSection(monthData, "despesas");
+    var impostos = sumSection(monthData, "impostos");
+    var despesas = {orcado: despesasBase.orcado + impostos.orcado, realizado: despesasBase.realizado + impostos.realizado};
+    var investimentos = sumSection(monthData, "investimentos");
+    var dividas = sumSection(monthData, "dividas");
+    var resultado = {
+      orcado: receitas.orcado - despesas.orcado - dividas.orcado - investimentos.orcado,
+      realizado: receitas.realizado - despesas.realizado - dividas.realizado - investimentos.realizado
+    };
+    return {receitas:receitas, despesas:despesas, investimentos:investimentos, dividas:dividas, resultado:resultado};
+  }
+
+  /* ---------------- render ---------------- */
+
+  function renderMonthTabs(){
+    var nav = document.getElementById("monthTabs");
+    nav.innerHTML = "";
+    var keys = Object.keys(db.meses).sort();
+    keys.forEach(function(k){
+      var tab = document.createElement("div");
+      tab.className = "month-tab" + (k===activeMonth ? " active": "");
+      var span = document.createElement("span");
+      span.textContent = db.meses[k].label || monthLabelFromKey(k);
+      span.style.cursor = "pointer";
+      span.onclick = function(){ activeMonth = k; renderAll(); };
+      tab.appendChild(span);
+      if(keys.length > 1){
+        var del = document.createElement("button");
+        del.className = "del-month";
+        del.textContent = "✕";
+        del.title = "Excluir mês";
+        del.onclick = function(ev){
+          ev.stopPropagation();
+          if(confirm('Excluir os lançamentos de "' + (db.meses[k].label) + '"? Essa ação não pode ser desfeita.')){
+            delete db.meses[k];
+            if(activeMonth === k){
+              activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
+            }
+            saveDB(); renderAll();
+          }
+        };
+        tab.appendChild(del);
+      }
+      nav.appendChild(tab);
+    });
+  }
+
+  function pct(realizado, orcado){
+    if(!orcado || orcado<=0) return 0;
+    return Math.max(0, Math.min(100, (realizado/orcado)*100));
+  }
+
+  function renderSummary(){
+    var wrap = document.getElementById("summary");
+    var md = db.meses[activeMonth];
+    var t = computeTotals(md);
+
+    var cards = [
+      {key:"receitas", label:"Receitas", data:t.receitas, hint:"do orçado recebido"},
+      {key:"despesas", label:"Despesas (com impostos)", data:t.despesas, hint:"do orçado gasto"},
+      {key:"investimentos", label:"Investimentos", data:t.investimentos, hint:"do orçado aportado"},
+      {key:"dividas", label:"Dívidas", data:t.dividas, hint:"do orçado quitado"}
+    ];
+
+    var html = "";
+    cards.forEach(function(c){
+      var p = pct(c.data.realizado, c.data.orcado);
+      html += '<div class="sum-card ' + c.key + '">' +
+        '<div class="sum-eyebrow">' + c.label + '</div>' +
+        '<div class="sum-value num">' + brl(c.data.realizado) + '</div>' +
+        '<div class="sum-sub">orçado: <span class="num">' + brl(c.data.orcado) + '</span></div>' +
+        '<div class="progress-track"><div class="progress-fill" style="width:' + p.toFixed(0) + '%"></div></div>' +
+        '</div>';
+    });
+
+    wrap.innerHTML = html;
+  }
+
+  var TREND_SERIES = [
+    {key:"receitas",      label:"Receitas",      color:"var(--receita-600)"},
+    {key:"despesas",      label:"Despesas",      color:"var(--despesa-600)"},
+    {key:"investimentos", label:"Investimentos", color:"var(--neutral-600)"},
+    {key:"dividas",       label:"Dívidas",       color:"var(--divida-600)"}
+  ];
+
+  function renderTrend(){
+    var wrap = document.getElementById("trendCard");
+    var keys = Object.keys(db.meses).sort();
+
+    var legendHtml = '<div class="trend-legend">' + TREND_SERIES.map(function(s){
+      return '<span class="legend-item"><span class="legend-dot" style="background:' + s.color + '"></span>' + s.label + '</span>';
+    }).join("") + '</div>';
+
+    var head = '<div class="trend-head"><h2>Evolução mensal (realizado)</h2>' + legendHtml + '</div>';
+
+    if(keys.length < 2){
+      wrap.innerHTML = head + '<div class="trend-empty">Crie mais meses para acompanhar a evolução de Receitas, Despesas, Investimentos e Dívidas ao longo do tempo.</div>';
+      return;
+    }
+
+    // dados por serie e por mes (realizado)
+    var series = TREND_SERIES.map(function(s){
+      return {
+        cfg: s,
+        values: keys.map(function(k){
+          var t = computeTotals(db.meses[k]);
+          return t[s.key].realizado;
+        })
+      };
+    });
+
+    var maxVal = 0;
+    series.forEach(function(s){ s.values.forEach(function(v){ if(v>maxVal) maxVal = v; }); });
+    if(maxVal <= 0) maxVal = 1;
+    maxVal = maxVal * 1.15;
+
+    var W = Math.max(560, keys.length * 92);
+    var H = 220;
+    var padL = 56, padR = 18, padT = 14, padB = 34;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+
+    function xAt(i){
+      if(keys.length === 1) return padL + plotW/2;
+      return padL + (i/(keys.length-1)) * plotW;
+    }
+    function yAt(v){
+      return padT + plotH - (v/maxVal) * plotH;
+    }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+
+    // linhas-guia horizontais (estilo pauta de caderno-razão)
+    var guides = 4;
+    for(var g=0; g<=guides; g++){
+      var gv = (maxVal/guides) * g;
+      var gy = yAt(gv);
+      svg += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W-padR) + '" y2="' + gy + '" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3" />';
+      svg += '<text x="' + (padL-8) + '" y="' + (gy+3) + '" text-anchor="end" class="trend-val-label">' + brl(gv).replace("R$","").trim() + '</text>';
+    }
+
+    // rótulos dos meses
+    keys.forEach(function(k,i){
+      svg += '<text x="' + xAt(i) + '" y="' + (H-10) + '" text-anchor="middle" class="trend-axis-label">' + (db.meses[k].label || monthLabelFromKey(k)) + '</text>';
+    });
+
+    // linhas e pontos por serie
+    series.forEach(function(s){
+      var pts = s.values.map(function(v,i){ return xAt(i) + "," + yAt(v); }).join(" ");
+      svg += '<polyline points="' + pts + '" fill="none" style="stroke:' + s.cfg.color + '" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round" />';
+      s.values.forEach(function(v,i){
+        svg += '<circle class="trend-pt" cx="' + xAt(i) + '" cy="' + yAt(v) + '" r="3.5" style="fill:' + s.cfg.color + '"><title>' +
+          s.cfg.label + ' — ' + (db.meses[keys[i]].label || monthLabelFromKey(keys[i])) + ': ' + brl(v) +
+          '</title></circle>';
+      });
+    });
+
+    svg += '</svg>';
+
+    wrap.innerHTML = head + '<div class="trend-svg-wrap">' + svg + '</div>';
+  }
+
+  function fieldsFor(sectionKey){
+    if(sectionKey === "dividas"){
+      return {orcadoLabel:"Parcela mês", realizadoLabel:"Pago"};
+    }
+    return {orcadoLabel:"Orçado", realizadoLabel:"Realizado"};
+  }
+
+  function renderSection(sectionCfg){
+    var md = db.meses[activeMonth];
+    var arr = md[sectionCfg.key] || [];
+    var fLabels = fieldsFor(sectionCfg.key);
+    var totals = sumSection(md, sectionCfg.key);
+
+    var box = document.createElement("div");
+    box.className = "sheet";
+
+    var head = document.createElement("div");
+    head.className = "sheet-head";
+    head.innerHTML =
+      '<h2>' + sectionCfg.title + '<span class="tag ' + sectionCfg.tagClass + '">' + arr.length + ' ' + (arr.length===1?'item':'itens') + '</span></h2>' +
+      '<div class="sheet-totals"><span>' + fLabels.orcadoLabel + ': <b class="num">' + brl(totals.orcado) + '</b></span>' +
+      '<span>' + fLabels.realizadoLabel + ': <b class="num">' + brl(totals.realizado) + '</b></span></div>';
+    box.appendChild(head);
+
+    var table = document.createElement("table");
+    var thead = document.createElement("thead");
+    thead.innerHTML = '<tr><th>Descrição</th><th class="col-val">' + fLabels.orcadoLabel + '</th><th class="col-val">' + fLabels.realizadoLabel + '</th><th class="col-act"></th></tr>';
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+
+    if(arr.length === 0){
+      var tr0 = document.createElement("tr");
+      tr0.className = "empty-row";
+      tr0.innerHTML = '<td colspan="4">Nenhum lançamento neste mês ainda.</td>';
+      tbody.appendChild(tr0);
+    }
+
+    arr.forEach(function(it){
+      var tr = document.createElement("tr");
+
+      var tdNome = document.createElement("td");
+      var inpNome = document.createElement("input");
+      inpNome.className = "cell-input name-input";
+      inpNome.type = "text";
+      inpNome.value = it.nome;
+      inpNome.placeholder = "Descrição";
+      inpNome.addEventListener("change", function(){
+        it.nome = inpNome.value;
+        saveDB();
+      });
+      tdNome.appendChild(inpNome);
+      tr.appendChild(tdNome);
+
+      ["orcado","realizado"].forEach(function(f){
+        var td = document.createElement("td");
+        var inp = document.createElement("input");
+        inp.className = "cell-input num";
+        inp.type = "text";
+        inp.inputMode = "decimal";
+        inp.value = it[f] ? it[f].toFixed(2).replace(".", ",") : "";
+        inp.placeholder = "0,00";
+        inp.addEventListener("focus", function(){
+          inp.value = it[f] ? String(it[f]).replace(".", ",") : "";
+          inp.select();
+        });
+        inp.addEventListener("blur", function(){
+          var v = parseNum(inp.value);
+          it[f] = v;
+          inp.value = v ? v.toFixed(2).replace(".", ",") : "";
+          saveDB();
+          renderSummary();
+          renderTrend();
+          refreshSheetTotals(sectionCfg.key, box);
+        });
+        td.appendChild(inp);
+        tr.appendChild(td);
+      });
+
+      var tdAct = document.createElement("td");
+      tdAct.className = "col-act";
+      var btnDel = document.createElement("button");
+      btnDel.className = "btn-del";
+      btnDel.textContent = "✕";
+      btnDel.title = "Remover lançamento";
+      btnDel.onclick = function(){
+        md[sectionCfg.key] = md[sectionCfg.key].filter(function(x){ return x.id !== it.id; });
+        saveDB();
+        renderAll();
+      };
+      tdAct.appendChild(btnDel);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    box.appendChild(table);
+
+    var rowAdd = document.createElement("div");
+    rowAdd.className = "row-add";
+    var btnAdd = document.createElement("button");
+    btnAdd.className = "btn-add";
+    btnAdd.textContent = "+ adicionar lançamento em " + sectionCfg.title.toLowerCase();
+    btnAdd.onclick = function(){
+      md[sectionCfg.key].push(item("", 0, 0));
+      saveDB();
+      renderAll();
+      var lastInputs = box.querySelectorAll(".name-input");
+      if(lastInputs.length) lastInputs[lastInputs.length-1].focus();
+    };
+    rowAdd.appendChild(btnAdd);
+    box.appendChild(rowAdd);
+
+    return box;
+  }
+
+  function refreshSheetTotals(sectionKey, box){
+    var md = db.meses[activeMonth];
+    var totals = sumSection(md, sectionKey);
+    var fLabels = fieldsFor(sectionKey);
+    var spans = box.querySelectorAll(".sheet-totals b");
+    if(spans.length === 2){
+      spans[0].textContent = brl(totals.orcado);
+      spans[1].textContent = brl(totals.realizado);
+    }
+  }
+
+  function renderSheets(){
+    var wrap = document.getElementById("sheets");
+    wrap.innerHTML = "";
+    SECTIONS.forEach(function(cfg){
+      wrap.appendChild(renderSection(cfg));
+    });
+  }
+
+  function renderAll(){
+    if(!db.meses[activeMonth]) activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
+    renderMonthTabs();
+    renderSummary();
+    renderTrend();
+    renderSheets();
+  }
+
+  /* ---------------- modal: novo mês ---------------- */
+
+  var overlay = document.getElementById("modalOverlay");
+  document.getElementById("btnNewMonth").onclick = function(){
+    var now = new Date();
+    document.getElementById("selMes").value = String(now.getMonth()+1).padStart(2,"0");
+    document.getElementById("inpAno").value = now.getFullYear();
+    overlay.classList.add("open");
+  };
+  document.getElementById("btnCancelModal").onclick = function(){ overlay.classList.remove("open"); };
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) overlay.classList.remove("open"); });
+
+  document.getElementById("btnConfirmModal").onclick = function(){
+    var mes = document.getElementById("selMes").value;
+    var ano = document.getElementById("inpAno").value;
+    var key = ano + "-" + mes;
+    var copiar = document.getElementById("chkCopiar").checked;
+    var label = monthLabelFromKey(key);
+
+    if(db.meses[key]){
+      alert("Já existe um mês cadastrado para " + label + ".");
+      return;
+    }
+
+    if(copiar && db.meses[activeMonth]){
+      db.meses[key] = cloneMonthCarry(db.meses[activeMonth], label);
+    } else {
+      db.meses[key] = emptyMonth(label);
+    }
+    activeMonth = key;
+    saveDB();
+    renderAll();
+    overlay.classList.remove("open");
+  };
+
+  /* ---------------- backup menu ---------------- */
+
+  var backupBtn = document.getElementById("btnBackupToggle");
+  var backupDropdown = document.getElementById("backupDropdown");
+  backupBtn.onclick = function(e){
+    e.stopPropagation();
+    backupDropdown.classList.toggle("open");
+  };
+  document.addEventListener("click", function(){ backupDropdown.classList.remove("open"); });
+  backupDropdown.addEventListener("click", function(e){ e.stopPropagation(); });
+
+  document.getElementById("btnExport").onclick = function(){
+    var blob = new Blob([JSON.stringify(db, null, 2)], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "arkad-backup-" + activeMonth + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    backupDropdown.classList.remove("open");
+  };
+
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var parsed = JSON.parse(ev.target.result);
+        if(!parsed || !parsed.meses) throw new Error("formato inválido");
+        db = parsed;
+        activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
+        saveDB();
+        renderAll();
+        showToast("Backup importado");
+      }catch(err){
+        alert("Não foi possível importar esse arquivo: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+    backupDropdown.classList.remove("open");
+  });
+
+  document.getElementById("btnRestoreSeed").onclick = function(){
+    if(confirm("Isso vai restaurar os dados originais de Junho/26 e não pode ser desfeito. Continuar?")){
+      var seed = seedJunho26();
+      db.meses["2026-06"] = seed["2026-06"];
+      activeMonth = "2026-06";
+      saveDB();
+      renderAll();
+    }
+    backupDropdown.classList.remove("open");
+  };
+
+  /* ---------------- start ---------------- */
+  renderAll();
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(){ /* offline/instalação segue funcionando sem SW */ });
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
