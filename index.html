@@ -112,32 +112,8 @@
   .month-tab.active .del-month{opacity:.55;}
   .month-tab.active .del-month:hover{opacity:1;}
 
-  .topbar-actions{display:flex; align-items:center; gap:10px;}
-  .btn-ghost{
-    background:transparent; border:1px solid rgba(184,146,47,0.5);
-    color:var(--brass-300); padding:9px 14px; border-radius:6px; font-size:13px; font-weight:600;
-  }
-  .btn-ghost:hover{background:rgba(184,146,47,0.12);}
-
-  .backup-menu{position:relative;}
-  .btn-icon{
-    background:transparent; border:1px solid rgba(184,146,47,0.5); color:var(--brass-300);
-    width:34px; height:34px; border-radius:6px; font-size:16px;
-  }
-  .backup-dropdown{
-    display:none; position:absolute; right:0; top:42px; background:var(--paper-50);
-    border:1px solid var(--line-strong); border-radius:8px; box-shadow:var(--shadow-card);
-    min-width:250px; padding:6px; z-index:40;
-  }
-  .backup-dropdown.open{display:block;}
-  .backup-dropdown button, .backup-dropdown .file-btn{
-    display:block; width:100%; text-align:left; background:none; border:none;
-    padding:9px 10px; font-size:13px; border-radius:5px; color:var(--text-900);
-  }
-  .backup-dropdown button:hover, .backup-dropdown .file-btn:hover{background:var(--paper-200);}
-
   /* ---------- main ledger ---------- */
-  .ledger{ max-width:1180px; margin:0 auto; padding:26px 20px 90px; }
+  .ledger{ max-width:1180px; margin:0 auto; padding:26px 20px 130px; }
 
   /* ---------- summary ---------- */
   .summary{
@@ -298,12 +274,118 @@
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
   .toast .dot{width:6px; height:6px; border-radius:50%; background:var(--brass-300);}
 
+  /* ---------- views (páginas) ---------- */
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .page-title-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .page-title-row h2{font-size:19px; font-weight:600; color:var(--paper-50);}
+  .section-label{
+    color:var(--brass-300); font-size:11px; text-transform:uppercase; letter-spacing:1.4px;
+    font-weight:700; margin:24px 2px 10px;
+  }
+  .btn-plus-round{
+    width:34px; height:34px; border-radius:50%; border:1.5px solid var(--brass-300);
+    background:transparent; color:var(--brass-300); font-size:18px; line-height:1;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .btn-plus-round:hover{background:rgba(184,146,47,0.15);}
+
+  /* ---------- metas ---------- */
+  .meta-stats{padding:18px 18px 16px;}
+  .meta-stats-eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--text-600); font-weight:600;}
+  .meta-stats-value{font-size:27px; font-weight:700; margin-top:6px;}
+  .meta-stats-sub{font-size:12px; color:var(--text-600); margin-top:3px;}
+  .meta-stats-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;}
+  .meta-stats-box{background:var(--paper-100); border-radius:6px; padding:10px 12px;}
+  .mini-label{font-size:10.5px; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-600); font-weight:600;}
+  .mini-value{font-size:19px; font-weight:700; margin-top:3px;}
+  .mini-value.good{color:var(--receita-600);}
+
+  .goal-card{padding:16px 18px 18px; position:relative;}
+  .goal-del{position:absolute; top:14px; right:14px;}
+  .goal-head{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .goal-avatar{
+    width:42px; height:42px; border-radius:50%; border:2px solid; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Zilla Slab', serif; font-weight:700; font-size:16px;
+  }
+  .goal-name{font-size:15px; font-weight:600;}
+  .goal-tag{display:inline-block; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px; margin-top:5px;}
+  .goal-progress{margin:2px 0 6px;}
+  .goal-row{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-600); margin-bottom:14px;}
+  .goal-cols{display:grid; grid-template-columns:1fr auto; gap:12px; align-items:end; margin-bottom:14px;}
+  .goal-atual{font-size:19px; font-weight:700; margin:2px 0 4px;}
+  .goal-faltam-box{background:var(--paper-100); border-radius:6px; padding:10px 14px; text-align:right;}
+  .goal-deposit-btn{
+    width:100%; background:var(--receita-600); color:var(--paper-50); border:none;
+    padding:12px; border-radius:8px; font-size:13.5px; font-weight:700;
+  }
+  .goal-deposit-btn:hover{background:#255c3f;}
+
+  /* ---------- config ---------- */
+  .config-list{padding:2px 0;}
+  .config-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+    text-align:left; background:none; border:none; border-bottom:1px dashed var(--line);
+    padding:13px 18px; font-size:13.5px; color:var(--text-900); font-weight:500;
+  }
+  .config-row:last-child{border-bottom:none;}
+  .config-row:hover{background:rgba(184,146,47,0.06);}
+  .config-row-title{font-weight:600;}
+  .config-row-sub{font-size:11.5px; color:var(--text-600); margin-top:2px;}
+  .config-row-actions{display:flex; align-items:center; gap:8px; flex:none;}
+  .btn-sm{padding:6px 10px; font-size:11.5px; border-radius:5px;}
+  .badge-active{
+    font-size:9px; text-transform:uppercase; letter-spacing:0.6px; color:var(--receita-600);
+    background:var(--receita-100); padding:2px 7px; border-radius:20px; margin-left:6px; font-weight:700;
+  }
+  .about-text{padding:14px 18px 18px; font-size:12.5px; color:var(--text-600); line-height:1.6;}
+
+  /* ---------- bottom nav + fab ---------- */
+  .bottom-nav{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    display:flex; align-items:stretch; justify-content:space-around;
+    background:var(--ink-950);
+    border-top:1px solid rgba(184,146,47,0.28);
+    padding:8px 6px calc(6px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 20px rgba(0,0,0,0.28);
+  }
+  .nav-item{
+    background:none; border:none; flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:6px 2px; color:rgba(241,233,216,0.42); font-size:10px; font-weight:600;
+  }
+  .nav-item svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8;}
+  .nav-item.active{color:var(--brass-300);}
+  .nav-fab-spacer{width:60px; flex:none;}
+
+  .fab{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+    width:58px; height:58px; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, var(--brass-300), var(--brass-500) 72%);
+    border:3px solid var(--ink-950);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 18px rgba(0,0,0,0.38);
+    z-index:61;
+  }
+  .fab:active{transform:translateX(-50%) scale(0.96);}
+  .fab-mark{font-family:'Zilla Slab', serif; font-weight:700; font-size:21px; color:var(--ink-950);}
+  .fab-plus{
+    position:absolute; right:-3px; bottom:-3px; width:21px; height:21px; border-radius:50%;
+    background:var(--receita-600); color:var(--paper-50); font-size:14px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; border:2px solid var(--ink-950);
+  }
+
   @media(max-width:760px){
     .summary{grid-template-columns:1fr 1fr;}
-    .stamp-wrap{grid-column:1/-1;}
     .topbar{padding:14px 16px;}
-    .ledger{padding:18px 12px 90px;}
+    .ledger{padding:18px 12px 128px;}
     thead th, td{padding:8px 10px;}
+    .goal-cols{grid-template-columns:1fr; gap:8px;}
+    .goal-faltam-box{text-align:left;}
   }
 </style>
 </head>
@@ -318,26 +400,74 @@
       </div>
     </div>
     <nav class="month-tabs" id="monthTabs"></nav>
-    <div class="topbar-actions">
-      <button class="btn-ghost" id="btnNewMonth">+ novo mês</button>
-      <div class="backup-menu">
-        <button class="btn-icon" id="btnBackupToggle" title="Backup e restauração">⋮</button>
-        <div class="backup-dropdown" id="backupDropdown">
-          <button id="btnExport">⭳ Baixar backup (.json)</button>
-          <label class="file-btn">⭱ Importar backup
-            <input type="file" id="importFile" accept="application/json" hidden>
-          </label>
-          <button id="btnRestoreSeed">↺ Restaurar dados originais de Jun/26</button>
-        </div>
-      </div>
-    </div>
   </header>
 
   <main class="ledger">
-    <section class="summary" id="summary"></section>
-    <section class="trend-card" id="trendCard"></section>
-    <div id="sheets"></div>
+
+    <div class="view active" id="view-dashboard">
+      <section class="summary" id="summary"></section>
+      <section class="trend-card" id="trendCard"></section>
+      <div id="sheets"></div>
+    </div>
+
+    <div class="view" id="view-dividas">
+      <div id="dividasSheetWrap"></div>
+    </div>
+
+    <div class="view" id="view-metas"></div>
+
+    <div class="view" id="view-config">
+      <div class="page-title-row"><h2>Config</h2></div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Meses cadastrados</h2></div>
+        <div class="config-list" id="configMonths"></div>
+        <div class="row-add"><button class="btn-add" id="btnNewMonth">+ novo mês</button></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Backup e restauração</h2></div>
+        <div class="config-list">
+          <button class="config-row" id="btnExport">⭳ Baixar backup (.json)</button>
+          <label class="config-row file-btn" style="cursor:pointer;">⭱ Importar backup
+            <input type="file" id="importFile" accept="application/json" hidden>
+          </label>
+          <button class="config-row" id="btnRestoreSeed">↺ Restaurar dados originais de Jun/26</button>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Sobre</h2></div>
+        <div class="about-text">Arkad — controle financeiro pessoal, mês a mês. Os dados ficam salvos apenas neste navegador (localStorage); use o backup para não perdê-los.</div>
+      </div>
+    </div>
+
   </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="dashboard">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.6"></rect><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"></rect><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"></rect><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"></rect></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-item" data-tab="dividas">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.4"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+      <span>Dívidas</span>
+    </button>
+    <div class="nav-fab-spacer"></div>
+    <button class="nav-item" data-tab="metas">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"></circle></svg>
+      <span>Metas</span>
+    </button>
+    <button class="nav-item" data-tab="config">
+      <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"></line><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"></circle><line x1="4" y1="12" x2="20" y2="12"></line><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"></circle><line x1="4" y1="18" x2="20" y2="18"></line><circle cx="7" cy="18" r="2" fill="currentColor" stroke="none"></circle></svg>
+      <span>Config</span>
+    </button>
+  </nav>
+
+  <button class="fab" id="btnQuickAdd" title="Lançamento rápido">
+    <span class="fab-mark">A</span>
+    <span class="fab-plus">+</span>
+  </button>
 
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
@@ -368,6 +498,81 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="quickAddOverlay">
+    <div class="modal">
+      <h3>Lançamento rápido</h3>
+      <div class="field">
+        <label for="qaTipo">Tipo</label>
+        <select id="qaTipo">
+          <option value="despesas">Despesa</option>
+          <option value="receitas">Receita</option>
+          <option value="investimentos">Investimento</option>
+          <option value="dividas">Dívida</option>
+          <option value="meta">Depósito em meta</option>
+        </select>
+      </div>
+      <div class="field" id="qaMetaField" style="display:none;">
+        <label for="qaMeta">Meta</label>
+        <select id="qaMeta"></select>
+      </div>
+      <div class="field" id="qaNomeField">
+        <label for="qaNome">Descrição</label>
+        <input type="text" id="qaNome" placeholder="Ex: Uber, Mercado...">
+      </div>
+      <div class="field">
+        <label for="qaValor">Valor</label>
+        <input type="text" id="qaValor" inputmode="decimal" placeholder="0,00">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelQA">Cancelar</button>
+        <button class="btn-primary" id="btnConfirmQA">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="goalModalOverlay">
+    <div class="modal">
+      <h3>Nova meta</h3>
+      <div class="field">
+        <label for="goalNome">Nome</label>
+        <input type="text" id="goalNome" placeholder="Ex: Reserva de emergência">
+      </div>
+      <div class="field">
+        <label for="goalValor">Valor da meta</label>
+        <input type="text" id="goalValor" inputmode="decimal" placeholder="0,00">
+      </div>
+      <div class="field">
+        <label for="goalTag">Categoria</label>
+        <select id="goalTag">
+          <option value="emergencia">Emergência</option>
+          <option value="viagem">Viagem</option>
+          <option value="compra">Compra</option>
+          <option value="investimento">Investimento</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelGoal">Cancelar</button>
+        <button class="btn-primary" id="btnConfirmGoal">Criar meta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="depositModalOverlay">
+    <div class="modal">
+      <h3>Adicionar depósito</h3>
+      <p id="depositGoalName" style="font-size:13px; color:var(--text-600); margin:-8px 0 14px;"></p>
+      <div class="field">
+        <label for="depositValor">Valor do depósito</label>
+        <input type="text" id="depositValor" inputmode="decimal" placeholder="0,00">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelDeposit">Cancelar</button>
+        <button class="btn-primary" id="btnConfirmDeposit">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Salvo</span></div>
 
 <script>
@@ -384,6 +589,9 @@
     {key:"investimentos",  title:"Investimentos",  tagClass:"investimentos-tag",  cardClass:"investimentos",  sign:"-"},
     {key:"dividas",        title:"Dívidas",        tagClass:"dividas-tag",        cardClass:"dividas",        sign:"-"}
   ];
+
+  var DASHBOARD_SECTIONS = SECTIONS.filter(function(s){ return s.key !== "dividas"; });
+  var DIVIDAS_SECTION = SECTIONS.filter(function(s){ return s.key === "dividas"; })[0];
 
   function uid(p){
     return (p||"i") + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
@@ -463,17 +671,24 @@
       if(raw){
         var parsed = JSON.parse(raw);
         if(parsed && parsed.meses && Object.keys(parsed.meses).length){
+          if(!parsed.metas) parsed.metas = [];
           return parsed;
         }
       }
     }catch(e){ console.warn("Falha ao ler localStorage, recriando dados.", e); }
-    var db = {meses: seedJunho26()};
+    var db = {
+      meses: seedJunho26(),
+      metas: [
+        {id: uid("meta"), nome:"Reserva de emergência", valorMeta:1000, valorAtual:0, tag:"emergencia", deposits:[]}
+      ]
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     return db;
   }
 
   var db = loadDB();
   var activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
+  var activeTab = "dashboard";
 
   function saveDB(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
@@ -514,6 +729,24 @@
     var y = parts[0], m = parseInt(parts[1],10);
     return names[m] + "/" + y.slice(2);
   }
+
+  function escapeHtml(s){
+    return String(s==null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  var TAGS = {
+    emergencia:   {label:"Emergência",   color:"var(--despesa-600)",      bg:"var(--despesa-100)"},
+    viagem:       {label:"Viagem",       color:"var(--brass-500)",        bg:"rgba(184,146,47,0.16)"},
+    compra:       {label:"Compra",       color:"var(--neutral-600)",      bg:"var(--neutral-100)"},
+    investimento: {label:"Investimento", color:"var(--receita-600)",      bg:"var(--receita-100)"},
+    outro:        {label:"Outro",        color:"var(--text-600)",         bg:"var(--paper-200)"}
+  };
+
+  var SECTION_DEFAULT_NAME = {
+    receitas:"Receita", despesas:"Despesa", investimentos:"Investimento", dividas:"Dívida"
+  };
 
   function sumSection(monthData, key){
     var arr = monthData[key] || [];
@@ -817,8 +1050,112 @@
   function renderSheets(){
     var wrap = document.getElementById("sheets");
     wrap.innerHTML = "";
-    SECTIONS.forEach(function(cfg){
+    DASHBOARD_SECTIONS.forEach(function(cfg){
       wrap.appendChild(renderSection(cfg));
+    });
+  }
+
+  function renderDividasView(){
+    var wrap = document.getElementById("dividasSheetWrap");
+    wrap.innerHTML = "";
+    wrap.appendChild(renderSection(DIVIDAS_SECTION));
+  }
+
+  function renderMetas(){
+    var wrap = document.getElementById("view-metas");
+    if(!wrap) return;
+    var metas = db.metas || [];
+    var totalAtual = metas.reduce(function(a,m){ return a + (Number(m.valorAtual)||0); }, 0);
+    var totalMeta = metas.reduce(function(a,m){ return a + (Number(m.valorMeta)||0); }, 0);
+    var ativas = metas.filter(function(m){ return m.valorAtual < m.valorMeta; }).length;
+    var concluidas = metas.length - ativas;
+    var pctTotal = totalMeta > 0 ? Math.min(100, (totalAtual/totalMeta)*100) : 0;
+
+    var html = '<div class="page-title-row"><h2>Metas</h2><button class="btn-plus-round" id="btnNewGoal" title="Nova meta">+</button></div>';
+
+    html += '<div class="sheet meta-stats">' +
+      '<div class="meta-stats-eyebrow">↗ Total economizado</div>' +
+      '<div class="meta-stats-value num">' + brl(totalAtual) + '</div>' +
+      '<div class="meta-stats-sub">de <span class="num">' + brl(totalMeta) + '</span> (meta total)</div>' +
+      '<div class="progress-track" style="margin-top:12px;"><div class="progress-fill" style="width:' + pctTotal.toFixed(0) + '%; background:var(--brass-500);"></div></div>' +
+      '<div class="meta-stats-grid">' +
+        '<div class="meta-stats-box"><div class="mini-label">Metas Ativas</div><div class="mini-value">' + ativas + '</div></div>' +
+        '<div class="meta-stats-box"><div class="mini-label">Concluídas</div><div class="mini-value good">' + concluidas + '</div></div>' +
+      '</div>' +
+    '</div>';
+
+    html += '<div class="section-label">Suas metas</div>';
+
+    if(metas.length === 0){
+      html += '<div class="sheet"><div class="trend-empty">Você ainda não tem metas. Toque no "+" acima para criar a primeira.</div></div>';
+    } else {
+      metas.forEach(function(m){
+        var tag = TAGS[m.tag] || TAGS.outro;
+        var pct = m.valorMeta > 0 ? Math.min(100, (m.valorAtual/m.valorMeta)*100) : 0;
+        var faltam = Math.max(0, m.valorMeta - m.valorAtual);
+        var done = m.valorMeta > 0 && m.valorAtual >= m.valorMeta;
+        html += '<div class="sheet goal-card">' +
+          '<button class="btn-del goal-del" data-goal="' + m.id + '" title="Excluir meta">✕</button>' +
+          '<div class="goal-head">' +
+            '<div class="goal-avatar" style="color:' + tag.color + '; border-color:' + tag.color + '">' + (done ? "✓" : "A") + '</div>' +
+            '<div>' +
+              '<div class="goal-name">' + escapeHtml(m.nome) + '</div>' +
+              '<span class="goal-tag" style="background:' + tag.bg + '; color:' + tag.color + '">' + tag.label + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="progress-track goal-progress"><div class="progress-fill" style="width:' + pct.toFixed(0) + '%; background:' + tag.color + '"></div></div>' +
+          '<div class="goal-row"><span class="num">' + brl(m.valorAtual) + '</span><span>' + pct.toFixed(0) + '%</span></div>' +
+          '<div class="goal-cols">' +
+            '<div><div class="mini-label">Valor Atual</div><div class="goal-atual num">' + brl(m.valorAtual) + '</div><div class="mini-label">Meta: <span class="num">' + brl(m.valorMeta) + '</span></div></div>' +
+            '<div class="goal-faltam-box"><div class="mini-label">Faltam</div><div class="num">' + brl(faltam) + '</div></div>' +
+          '</div>' +
+          '<button class="goal-deposit-btn" data-goal="' + m.id + '">+ Adicionar Depósito</button>' +
+        '</div>';
+      });
+    }
+
+    wrap.innerHTML = html;
+
+    var btnNewGoal = document.getElementById("btnNewGoal");
+    if(btnNewGoal) btnNewGoal.onclick = openGoalModal;
+    wrap.querySelectorAll(".goal-del").forEach(function(btn){
+      btn.onclick = function(){ deleteGoal(btn.getAttribute("data-goal")); };
+    });
+    wrap.querySelectorAll(".goal-deposit-btn").forEach(function(btn){
+      btn.onclick = function(){ openDepositModal(btn.getAttribute("data-goal")); };
+    });
+  }
+
+  function renderConfigMonths(){
+    var wrap = document.getElementById("configMonths");
+    if(!wrap) return;
+    var keys = Object.keys(db.meses).sort();
+    var html = "";
+    keys.forEach(function(k){
+      var t = computeTotals(db.meses[k]);
+      var label = db.meses[k].label || monthLabelFromKey(k);
+      html += '<div class="config-row" style="cursor:default;">' +
+        '<div><div class="config-row-title">' + escapeHtml(label) + (k===activeMonth ? ' <span class="badge-active">ativo</span>' : '') + '</div>' +
+        '<div class="config-row-sub">Resultado realizado: <span class="num">' + brl(t.resultado.realizado) + '</span></div></div>' +
+        '<div class="config-row-actions">' +
+          (k!==activeMonth ? '<button class="btn-secondary btn-sm" data-select="' + k + '">Selecionar</button>' : '') +
+          (keys.length>1 ? '<button class="btn-del" data-del="' + k + '" title="Excluir mês">✕</button>' : '') +
+        '</div></div>';
+    });
+    wrap.innerHTML = html;
+
+    wrap.querySelectorAll("[data-select]").forEach(function(b){
+      b.onclick = function(){ activeMonth = b.getAttribute("data-select"); renderAll(); };
+    });
+    wrap.querySelectorAll("[data-del]").forEach(function(b){
+      b.onclick = function(){
+        var k = b.getAttribute("data-del");
+        if(confirm('Excluir os lançamentos de "' + (db.meses[k].label) + '"? Essa ação não pode ser desfeita.')){
+          delete db.meses[k];
+          if(activeMonth === k){ activeMonth = Object.keys(db.meses).sort().slice(-1)[0]; }
+          saveDB(); renderAll();
+        }
+      };
     });
   }
 
@@ -828,6 +1165,9 @@
     renderSummary();
     renderTrend();
     renderSheets();
+    renderDividasView();
+    renderMetas();
+    renderConfigMonths();
   }
 
   /* ---------------- modal: novo mês ---------------- */
@@ -865,16 +1205,7 @@
     overlay.classList.remove("open");
   };
 
-  /* ---------------- backup menu ---------------- */
-
-  var backupBtn = document.getElementById("btnBackupToggle");
-  var backupDropdown = document.getElementById("backupDropdown");
-  backupBtn.onclick = function(e){
-    e.stopPropagation();
-    backupDropdown.classList.toggle("open");
-  };
-  document.addEventListener("click", function(){ backupDropdown.classList.remove("open"); });
-  backupDropdown.addEventListener("click", function(e){ e.stopPropagation(); });
+  /* ---------------- backup e restauração ---------------- */
 
   document.getElementById("btnExport").onclick = function(){
     var blob = new Blob([JSON.stringify(db, null, 2)], {type:"application/json"});
@@ -886,7 +1217,6 @@
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    backupDropdown.classList.remove("open");
   };
 
   document.getElementById("importFile").addEventListener("change", function(e){
@@ -897,6 +1227,7 @@
       try{
         var parsed = JSON.parse(ev.target.result);
         if(!parsed || !parsed.meses) throw new Error("formato inválido");
+        if(!parsed.metas) parsed.metas = [];
         db = parsed;
         activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
         saveDB();
@@ -908,7 +1239,6 @@
     };
     reader.readAsText(file);
     e.target.value = "";
-    backupDropdown.classList.remove("open");
   });
 
   document.getElementById("btnRestoreSeed").onclick = function(){
@@ -919,7 +1249,145 @@
       saveDB();
       renderAll();
     }
-    backupDropdown.classList.remove("open");
+  };
+
+  /* ---------------- navegação por abas (bottom nav) ---------------- */
+
+  function setActiveTab(tab){
+    activeTab = tab;
+    document.querySelectorAll(".nav-item").forEach(function(b){
+      b.classList.toggle("active", b.getAttribute("data-tab") === tab);
+    });
+    document.querySelectorAll(".view").forEach(function(v){
+      v.classList.toggle("active", v.id === "view-" + tab);
+    });
+    window.scrollTo({top:0, behavior:"auto"});
+  }
+  document.querySelectorAll(".nav-item").forEach(function(b){
+    b.addEventListener("click", function(){ setActiveTab(b.getAttribute("data-tab")); });
+  });
+
+  /* ---------------- lançamento rápido (FAB) ---------------- */
+
+  var qaOverlay = document.getElementById("quickAddOverlay");
+
+  function toggleQaMetaField(){
+    var tipo = document.getElementById("qaTipo").value;
+    var isMeta = tipo === "meta";
+    document.getElementById("qaMetaField").style.display = isMeta ? "block" : "none";
+    document.getElementById("qaNomeField").style.display = isMeta ? "none" : "block";
+  }
+
+  function populateQaMetaSelect(){
+    var sel = document.getElementById("qaMeta");
+    var metas = db.metas || [];
+    sel.innerHTML = metas.map(function(m){ return '<option value="' + m.id + '">' + escapeHtml(m.nome) + '</option>'; }).join("");
+  }
+
+  document.getElementById("btnQuickAdd").onclick = function(){
+    document.getElementById("qaTipo").value = "despesas";
+    document.getElementById("qaNome").value = "";
+    document.getElementById("qaValor").value = "";
+    toggleQaMetaField();
+    populateQaMetaSelect();
+    document.getElementById("qaTipo").querySelector('option[value="meta"]').disabled = (db.metas||[]).length === 0;
+    qaOverlay.classList.add("open");
+    setTimeout(function(){ document.getElementById("qaNome").focus(); }, 60);
+  };
+  document.getElementById("btnCancelQA").onclick = function(){ qaOverlay.classList.remove("open"); };
+  qaOverlay.addEventListener("click", function(e){ if(e.target === qaOverlay) qaOverlay.classList.remove("open"); });
+  document.getElementById("qaTipo").addEventListener("change", toggleQaMetaField);
+
+  document.getElementById("btnConfirmQA").onclick = function(){
+    var tipo = document.getElementById("qaTipo").value;
+    var valor = parseNum(document.getElementById("qaValor").value);
+    if(valor <= 0){ alert("Informe um valor maior que zero."); return; }
+
+    if(tipo === "meta"){
+      var metaId = document.getElementById("qaMeta").value;
+      var m = (db.metas||[]).filter(function(x){ return x.id === metaId; })[0];
+      if(!m){ alert("Crie uma meta primeiro."); return; }
+      m.valorAtual += valor;
+      m.deposits.push({id:uid("dep"), valor:valor, data:new Date().toISOString()});
+      saveDB();
+      renderMetas();
+      renderConfigMonths();
+      if(m.valorAtual >= m.valorMeta) showToast("Meta concluída! 🎉");
+    } else {
+      var nome = document.getElementById("qaNome").value.trim() || SECTION_DEFAULT_NAME[tipo];
+      if(!db.meses[activeMonth][tipo]) db.meses[activeMonth][tipo] = [];
+      db.meses[activeMonth][tipo].push(item(nome, 0, valor));
+      saveDB();
+      renderAll();
+    }
+    qaOverlay.classList.remove("open");
+  };
+
+  /* ---------------- metas: nova meta ---------------- */
+
+  var goalOverlay = document.getElementById("goalModalOverlay");
+
+  function openGoalModal(){
+    document.getElementById("goalNome").value = "";
+    document.getElementById("goalValor").value = "";
+    document.getElementById("goalTag").value = "outro";
+    goalOverlay.classList.add("open");
+    setTimeout(function(){ document.getElementById("goalNome").focus(); }, 60);
+  }
+  document.getElementById("btnCancelGoal").onclick = function(){ goalOverlay.classList.remove("open"); };
+  goalOverlay.addEventListener("click", function(e){ if(e.target === goalOverlay) goalOverlay.classList.remove("open"); });
+
+  document.getElementById("btnConfirmGoal").onclick = function(){
+    var nome = document.getElementById("goalNome").value.trim();
+    var valor = parseNum(document.getElementById("goalValor").value);
+    var tag = document.getElementById("goalTag").value;
+    if(!nome){ alert("Dê um nome para a meta."); return; }
+    if(valor <= 0){ alert("Informe um valor de meta maior que zero."); return; }
+    if(!db.metas) db.metas = [];
+    db.metas.push({id: uid("meta"), nome:nome, valorMeta:valor, valorAtual:0, tag:tag, deposits:[]});
+    saveDB();
+    renderMetas();
+    goalOverlay.classList.remove("open");
+  };
+
+  function deleteGoal(id){
+    var m = (db.metas||[]).filter(function(x){ return x.id === id; })[0];
+    if(!m) return;
+    if(confirm('Excluir a meta "' + m.nome + '"? Essa ação não pode ser desfeita.')){
+      db.metas = db.metas.filter(function(x){ return x.id !== id; });
+      saveDB();
+      renderMetas();
+    }
+  }
+
+  /* ---------------- metas: adicionar depósito ---------------- */
+
+  var depositOverlay = document.getElementById("depositModalOverlay");
+  var depositTargetId = null;
+
+  function openDepositModal(id){
+    var m = (db.metas||[]).filter(function(x){ return x.id === id; })[0];
+    if(!m) return;
+    depositTargetId = id;
+    document.getElementById("depositGoalName").textContent = m.nome;
+    document.getElementById("depositValor").value = "";
+    depositOverlay.classList.add("open");
+    setTimeout(function(){ document.getElementById("depositValor").focus(); }, 60);
+  }
+  document.getElementById("btnCancelDeposit").onclick = function(){ depositOverlay.classList.remove("open"); };
+  depositOverlay.addEventListener("click", function(e){ if(e.target === depositOverlay) depositOverlay.classList.remove("open"); });
+
+  document.getElementById("btnConfirmDeposit").onclick = function(){
+    var valor = parseNum(document.getElementById("depositValor").value);
+    if(valor <= 0){ alert("Informe um valor maior que zero."); return; }
+    var m = (db.metas||[]).filter(function(x){ return x.id === depositTargetId; })[0];
+    if(!m) return;
+    m.valorAtual += valor;
+    m.deposits.push({id:uid("dep"), valor:valor, data:new Date().toISOString()});
+    saveDB();
+    renderMetas();
+    depositOverlay.classList.remove("open");
+    if(m.valorAtual >= m.valorMeta) showToast("Meta concluída! 🎉");
   };
 
   /* ---------------- start ---------------- */
