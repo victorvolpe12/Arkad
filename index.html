@@ -432,7 +432,6 @@
           <label class="config-row file-btn" style="cursor:pointer;">⭱ Importar backup
             <input type="file" id="importFile" accept="application/json" hidden>
           </label>
-          <button class="config-row" id="btnRestoreSeed">↺ Restaurar dados originais de Jun/26</button>
         </div>
       </div>
 
@@ -601,53 +600,6 @@
     return {id: uid("it"), nome: nome, orcado: orcado||0, realizado: realizado||0};
   }
 
-  function seedJunho26(){
-    var m = {};
-    m["2026-06"] = {
-      label: "Junho/26",
-      receitas: [
-        item("Repasse Volpe Games",0,0), item("Mercado Afiliados",0,0), item("Lotoni",0,0),
-        item("Robo Trader Do Bem",0,0), item("Investimentos B3",0,0),
-        item("Trabalho Farmacia",2624.20,2791.45),
-        item("Provisionado Pote do Sonhos",0,0),
-        item("Vale Alimentação",200,200),
-        item("Provisionado Pote de Ouro",0,0),
-        item("Mesa Prop",0,0), item("Ticket Raia",100,100), item("Venda OLX",0,0),
-        item("Repasse Pai e Mãe",0,0), item("Uber (recebido)",0,0), item("Mileto Robo",0,0),
-        item("Saldo Mês Anterior",0,0), item("Dinheiro",0,0)
-      ],
-      despesas: [
-        item("Victor Happiness",400,0), item("Carga de Celular",49.9,52.30),
-        item("Academia - Gympass",69.99,0), item("Uber",100,46.28),
-        item("Compras Mercado - $",200,200), item("Compra Mercado - Vale",0,0),
-        item("Hospedagem",0,0), item("Trader do Bem - Infra",49.9,0),
-        item("AWS",83.66,0), item("Clube iFood",5.95,0), item("Google iCloud",9.9,0),
-        item("Swile Gasto - Mercado",0,0), item("Aluguel Gabi",670,0),
-        item("Luz Gabi",196,179.69), item("Água",25,86.96),
-        item("Compras débito em folha",100,0), item("Bomba Gabi Itaú",0,0),
-        item("Neon",408.34,408.34), item("It Fashion cartão",89.67,89.67),
-        item("Reserva",0,334.90)
-      ],
-      impostos: [
-        item("INSS mês (8,62%)",226.35,226.91), item("Sindicato",26.24,26.24),
-        item("Vale Refeição",40,40), item("Vale Transporte",78.73,78.73)
-      ],
-      investimentos: [
-        item("Pote de Ouro (10%)",0,0), item("Reserva (10%)",0,0),
-        item("Robo Trader do Bem - Pote dos Sonhos (10%)",0,0),
-        item("Caridade",0,0), item("Robo Trader do Bem",0,0)
-      ],
-      dividas: [
-        item("PDA 2/12",0,0), item("Neon",0,0), item("Itaú",0,0),
-        item("Mercado Pago - Crédito",0,0),
-        item("Bomba ADV Gabi - Mercado Pago (2/12)",248.26,0),
-        item("Bomba ADV Gabi - Itaú (1/12)",270.15,0),
-        item("Celular 3/12 (Itaú)",0,0)
-      ]
-    };
-    return m;
-  }
-
   function emptyMonth(label){
     return {label:label, receitas:[], despesas:[], impostos:[], investimentos:[], dividas:[]};
   }
@@ -660,6 +612,12 @@
       });
     });
     return out;
+  }
+
+  function currentMonthKey(){
+    var now = new Date();
+    var mm = String(now.getMonth()+1).padStart(2,"0");
+    return now.getFullYear() + "-" + mm;
   }
 
   function loadDB(){
@@ -676,12 +634,11 @@
         }
       }
     }catch(e){ console.warn("Falha ao ler localStorage, recriando dados.", e); }
-    var db = {
-      meses: seedJunho26(),
-      metas: [
-        {id: uid("meta"), nome:"Reserva de emergência", valorMeta:1000, valorAtual:0, tag:"emergencia", deposits:[]}
-      ]
-    };
+    // Primeiro acesso: cada pessoa começa com o mês atual vazio, sem nenhum dado de exemplo.
+    var key = currentMonthKey();
+    var meses = {};
+    meses[key] = emptyMonth(monthLabelFromKey(key));
+    var db = {meses: meses, metas: []};
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     return db;
   }
@@ -1240,16 +1197,6 @@
     reader.readAsText(file);
     e.target.value = "";
   });
-
-  document.getElementById("btnRestoreSeed").onclick = function(){
-    if(confirm("Isso vai restaurar os dados originais de Junho/26 e não pode ser desfeito. Continuar?")){
-      var seed = seedJunho26();
-      db.meses["2026-06"] = seed["2026-06"];
-      activeMonth = "2026-06";
-      saveDB();
-      renderAll();
-    }
-  };
 
   /* ---------------- navegação por abas (bottom nav) ---------------- */
 
