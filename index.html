@@ -69,7 +69,7 @@
 
   /* ---------- topbar ---------- */
   .topbar{
-    display:flex; align-items:center; gap:20px;
+    display:flex; align-items:center; justify-content:center; gap:20px;
     padding:18px 28px;
     border-bottom:1px solid rgba(184,146,47,0.35);
     flex-wrap:wrap;
@@ -85,32 +85,42 @@
   .brand-text h1{color:var(--paper-50); font-size:22px; font-weight:700; letter-spacing:0.3px;}
   .brand-text p{color:var(--brass-300); font-size:11.5px; text-transform:uppercase; letter-spacing:1.6px; margin-top:2px;}
 
-  .month-tabs{
-    display:flex; align-items:flex-end; gap:2px; flex:1; overflow-x:auto;
-    padding-bottom:0;
+  .month-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:1180px; margin:0 auto; padding:14px 20px 16px;
+    border-bottom:1px solid rgba(184,146,47,0.22);
   }
-  .month-tab{
-    background:rgba(241,233,216,0.06);
-    border:1px solid rgba(184,146,47,0.3);
-    border-bottom:none;
-    color:var(--brass-300);
-    padding:9px 16px 8px;
-    font-size:13px; font-weight:600;
-    border-radius:6px 6px 0 0;
-    white-space:nowrap;
-    display:flex; align-items:center; gap:8px;
+  .month-nav-arrow{
+    background:none; border:none; color:var(--paper-50); opacity:0.6;
+    width:38px; height:38px; flex:none; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
   }
-  .month-tab.active{
-    background:var(--paper-100);
-    color:var(--ink-950);
-    border-color:var(--paper-100);
+  .month-nav-arrow:hover{opacity:1; background:rgba(184,146,47,0.14);}
+  .month-nav-arrow svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round;}
+  .month-nav-label{
+    font-family:'Zilla Slab', serif; font-size:21px; font-weight:700; color:var(--paper-50);
+    text-align:center; flex:1; letter-spacing:0.2px;
   }
-  .month-tab .del-month{
-    opacity:0; transition:opacity .15s; font-size:13px; line-height:1; color:var(--despesa-600);
-    background:none; border:none; padding:0 0 0 2px;
+
+  /* ---------- categorias de despesa ---------- */
+  .cat-card{padding:0; overflow:hidden;}
+  .cat-card-head{
+    width:100%; display:flex; align-items:center; gap:12px; text-align:left;
+    background:none; border:none; padding:15px 18px 13px; cursor:pointer;
   }
-  .month-tab.active .del-month{opacity:.55;}
-  .month-tab.active .del-month:hover{opacity:1;}
+  .cat-icon{
+    width:38px; height:38px; border-radius:50%; border:1.5px solid var(--line-strong);
+    display:flex; align-items:center; justify-content:center; flex:none; color:var(--text-600);
+  }
+  .cat-icon svg{width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+  .cat-label{font-size:15px; font-weight:600; flex:1;}
+  .cat-value{font-size:15.5px; font-weight:700;}
+  .cat-chevron{color:var(--text-600); font-size:15px; transition:transform .15s; flex:none;}
+  .cat-card-head.open .cat-chevron{transform:rotate(90deg);}
+  .cat-progress{margin:0 18px; width:auto;}
+  .cat-sub{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-600); padding:8px 18px 16px;}
+  .cat-detail{display:none; border-top:1px dashed var(--line); margin-top:2px;}
+  .cat-detail.open{display:block;}
 
   /* ---------- main ledger ---------- */
   .ledger{ max-width:1180px; margin:0 auto; padding:26px 20px 130px; }
@@ -296,6 +306,7 @@
 
   /* ---------- metas ---------- */
   .meta-stats{padding:18px 18px 16px;}
+  #budgetProgress{padding:18px 18px 16px;}
   .meta-stats-eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--text-600); font-weight:600;}
   .meta-stats-value{font-size:27px; font-weight:700; margin-top:6px;}
   .meta-stats-sub{font-size:12px; color:var(--text-600); margin-top:3px;}
@@ -339,11 +350,37 @@
   .config-row-sub{font-size:11.5px; color:var(--text-600); margin-top:2px;}
   .config-row-actions{display:flex; align-items:center; gap:8px; flex:none;}
   .btn-sm{padding:6px 10px; font-size:11.5px; border-radius:5px;}
+  .config-row select{
+    padding:8px 10px; border:1px solid var(--line-strong); border-radius:6px;
+    background:var(--paper-100); font-family:inherit; font-size:12.5px; color:var(--text-900);
+  }
   .badge-active{
     font-size:9px; text-transform:uppercase; letter-spacing:0.6px; color:var(--receita-600);
     background:var(--receita-100); padding:2px 7px; border-radius:20px; margin-left:6px; font-weight:700;
   }
   .about-text{padding:14px 18px 18px; font-size:12.5px; color:var(--text-600); line-height:1.6;}
+
+  .cat-manager-group{padding:12px 18px; border-bottom:1px dashed var(--line);}
+  .cat-manager-group:last-child{border-bottom:none;}
+  .cat-manager-title{font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-600); font-weight:700; margin-bottom:9px;}
+  .cat-manager-chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .cat-chip{
+    display:inline-flex; align-items:center; gap:5px; background:var(--paper-100); border:1px solid var(--line);
+    border-radius:20px; padding:6px 6px 6px 12px; font-size:12.5px; font-weight:600; color:var(--text-900);
+  }
+  .cat-chip-del{
+    background:none; border:none; color:var(--text-600); font-size:11px; line-height:1;
+    width:18px; height:18px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cat-chip-del:hover{background:var(--despesa-100); color:var(--despesa-600);}
+
+  .switch{position:relative; display:inline-block; width:38px; height:22px; flex:none;}
+  .switch input{opacity:0; width:0; height:0; position:absolute;}
+  .switch-slider{position:absolute; inset:0; background:var(--paper-200); border-radius:20px; transition:background .15s; cursor:pointer;}
+  .switch-slider::before{content:""; position:absolute; width:16px; height:16px; left:3px; top:3px; background:#fff; border-radius:50%; transition:transform .15s; box-shadow:0 1px 2px rgba(0,0,0,0.25);}
+  .switch input:checked + .switch-slider{background:var(--receita-600);}
+  .switch input:checked + .switch-slider::before{transform:translateX(16px);}
 
   /* ---------- bottom nav + fab ---------- */
   .bottom-nav{
@@ -399,13 +436,23 @@
         <p>Controle financeiro pessoal</p>
       </div>
     </div>
-    <nav class="month-tabs" id="monthTabs"></nav>
   </header>
+
+  <div class="month-nav" id="monthNav">
+    <button class="month-nav-arrow" id="prevMonthBtn" title="Mês anterior">
+      <svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"></polyline></svg>
+    </button>
+    <div class="month-nav-label" id="monthNavLabel">—</div>
+    <button class="month-nav-arrow" id="nextMonthBtn" title="Próximo mês">
+      <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"></polyline></svg>
+    </button>
+  </div>
 
   <main class="ledger">
 
     <div class="view active" id="view-dashboard">
       <section class="summary" id="summary"></section>
+      <div class="sheet" id="budgetProgress"></div>
       <section class="trend-card" id="trendCard"></section>
       <div id="sheets"></div>
     </div>
@@ -423,6 +470,17 @@
         <div class="sheet-head"><h2>Meses cadastrados</h2></div>
         <div class="config-list" id="configMonths"></div>
         <div class="row-add"><button class="btn-add" id="btnNewMonth">+ novo mês</button></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Dashboard</h2></div>
+        <div class="config-list" id="dashboardSettingsList"></div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><h2>Categorias</h2></div>
+        <div class="config-row-sub" style="padding:2px 18px 10px;">Crie novas categorias pelo lançamento rápido (o "+" na barra inferior). Toque no ✕ para excluir uma — os lançamentos que já estão nela passam a aparecer em "Outros".</div>
+        <div id="categoryManagerList"></div>
       </div>
 
       <div class="sheet">
@@ -506,6 +564,7 @@
           <option value="despesas">Despesa</option>
           <option value="receitas">Receita</option>
           <option value="investimentos">Investimento</option>
+          <option value="impostos">Imposto</option>
           <option value="dividas">Dívida</option>
           <option value="meta">Depósito em meta</option>
         </select>
@@ -513,6 +572,14 @@
       <div class="field" id="qaMetaField" style="display:none;">
         <label for="qaMeta">Meta</label>
         <select id="qaMeta"></select>
+      </div>
+      <div class="field" id="qaCategoriaField">
+        <label for="qaCategoria">Categoria</label>
+        <select id="qaCategoria"></select>
+      </div>
+      <div class="field" id="qaNovaCategoriaField" style="display:none;">
+        <label for="qaNovaCategoriaNome">Nome da nova categoria</label>
+        <input type="text" id="qaNovaCategoriaNome" placeholder="Ex: Pets, Streaming...">
       </div>
       <div class="field" id="qaNomeField">
         <label for="qaNome">Descrição</label>
@@ -592,12 +659,100 @@
   var DASHBOARD_SECTIONS = SECTIONS.filter(function(s){ return s.key !== "dividas"; });
   var DIVIDAS_SECTION = SECTIONS.filter(function(s){ return s.key === "dividas"; })[0];
 
+  var CATEGORIZABLE = ["receitas","despesas","impostos","investimentos"];
+
+  var DEFAULT_CATEGORIES = {
+    despesas: [
+      {key:"moradia",     label:"Moradia",      icon:"moradia"},
+      {key:"alimentacao", label:"Alimentação",  icon:"alimentacao"},
+      {key:"transporte",  label:"Transporte",   icon:"transporte"},
+      {key:"saude",       label:"Saúde",        icon:"saude"},
+      {key:"educacao",    label:"Educação",     icon:"educacao"},
+      {key:"utilidades",  label:"Utilidades",   icon:"utilidades"},
+      {key:"outros",      label:"Outros",       icon:"outros"}
+    ],
+    receitas: [
+      {key:"salario",   label:"Salário",   icon:"salario"},
+      {key:"freelance", label:"Freelance", icon:"freelance"},
+      {key:"presente",  label:"Presente",  icon:"presente"},
+      {key:"outros",    label:"Outros",    icon:"outros"}
+    ],
+    investimentos: [
+      {key:"renda_fixa",     label:"Renda Fixa",     icon:"investimento"},
+      {key:"renda_variavel", label:"Renda Variável", icon:"investimento"},
+      {key:"reserva",        label:"Reserva",        icon:"outros"},
+      {key:"outros",         label:"Outros",         icon:"outros"}
+    ],
+    impostos: [
+      {key:"federal",     label:"Federal",     icon:"documento"},
+      {key:"municipal",   label:"Municipal",   icon:"documento"},
+      {key:"trabalhista", label:"Trabalhista", icon:"documento"},
+      {key:"outros",      label:"Outros",      icon:"outros"}
+    ]
+  };
+
+  function defaultCategoriesState(){
+    return {
+      despesas: DEFAULT_CATEGORIES.despesas.map(function(c){ return {key:c.key, label:c.label, icon:c.icon}; }),
+      receitas: DEFAULT_CATEGORIES.receitas.map(function(c){ return {key:c.key, label:c.label, icon:c.icon}; }),
+      investimentos: DEFAULT_CATEGORIES.investimentos.map(function(c){ return {key:c.key, label:c.label, icon:c.icon}; }),
+      impostos: DEFAULT_CATEGORIES.impostos.map(function(c){ return {key:c.key, label:c.label, icon:c.icon}; })
+    };
+  }
+
+  function getCategories(sectionKey){
+    return (db.categories && db.categories[sectionKey]) || [];
+  }
+
+  function categoryLabel(sectionKey, key){
+    var found = getCategories(sectionKey).filter(function(c){ return c.key === key; })[0];
+    return found ? found.label : "Outros";
+  }
+
+  function slugify(s){
+    var out = String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"");
+    return out || uid("cat");
+  }
+
+  function categoryIconSvg(iconKey){
+    var paths = {
+      moradia: '<path d="M4 11.5 12 4l8 7.5"></path><path d="M6 10v9h4v-5h4v5h4v-9"></path>',
+      alimentacao: '<path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"></path><circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none"></circle>',
+      transporte: '<path d="M4 16v-3.2a2 2 0 0 1 .4-1.2L6 8.5A2 2 0 0 1 7.6 8h8.8a2 2 0 0 1 1.6.8l1.6 3a2 2 0 0 1 .4 1.2V16"></path><path d="M4 16h16v1.6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V17H7v.6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V16Z"></path><circle cx="7.5" cy="16" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="16.5" cy="16" r="1.3" fill="currentColor" stroke="none"></circle>',
+      saude: '<path d="M12 20s-7-4.35-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 5c-2.5 4.65-9.5 9-9.5 9Z"></path>',
+      educacao: '<path d="M4 5.5A2 2 0 0 1 6 4h5v16H6a2 2 0 0 1-2-2z"></path><path d="M20 5.5A2 2 0 0 0 18 4h-5v16h5a2 2 0 0 0 2-2z"></path>',
+      utilidades: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"></path>',
+      salario: '<text x="12" y="16.5" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="700" fill="currentColor" stroke="none">R$</text>',
+      freelance: '<rect x="3" y="8" width="18" height="11" rx="1.6"></rect><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>',
+      presente: '<rect x="4" y="9" width="16" height="11" rx="1"></rect><path d="M4 9h16v3H4z"></path><path d="M12 9v11"></path><path d="M12 9c-1.2-3-5-3-5-.5S9 9 12 9Z"></path><path d="M12 9c1.2-3 5-3 5-.5S15 9 12 9Z"></path>',
+      investimento: '<polyline points="3 17 9 11 13 15 21 6"></polyline><polyline points="15 6 21 6 21 12"></polyline>',
+      documento: '<path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"></path><path d="M14 3v5h5"></path><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="13" y2="17"></line>',
+      outros: '<circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="18" cy="12" r="1.5" fill="currentColor" stroke="none"></circle>'
+    };
+    return '<svg viewBox="0 0 24 24">' + (paths[iconKey] || paths.outros) + '</svg>';
+  }
+
+  function sumByCategory(monthData, sectionKey){
+    var out = {};
+    getCategories(sectionKey).forEach(function(c){ out[c.key] = {orcado:0, realizado:0}; });
+    if(!out.outros) out.outros = {orcado:0, realizado:0};
+    (monthData[sectionKey]||[]).forEach(function(it){
+      var cat = (it.categoria && out[it.categoria]) ? it.categoria : "outros";
+      out[cat].orcado += Number(it.orcado)||0;
+      out[cat].realizado += Number(it.realizado)||0;
+    });
+    return out;
+  }
+
   function uid(p){
     return (p||"i") + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
   }
 
-  function item(nome, orcado, realizado){
-    return {id: uid("it"), nome: nome, orcado: orcado||0, realizado: realizado||0};
+  function item(nome, orcado, realizado, categoria){
+    var obj = {id: uid("it"), nome: nome, orcado: orcado||0, realizado: realizado||0};
+    if(categoria) obj.categoria = categoria;
+    return obj;
   }
 
   function emptyMonth(label){
@@ -608,16 +763,63 @@
     var out = emptyMonth(label);
     SECTIONS.forEach(function(s){
       out[s.key] = (src[s.key]||[]).map(function(it){
-        return {id: uid("it"), nome: it.nome, orcado: it.orcado, realizado: 0};
+        var novo = {id: uid("it"), nome: it.nome, orcado: it.orcado, realizado: 0};
+        if(it.categoria) novo.categoria = it.categoria;
+        return novo;
       });
     });
     return out;
+  }
+
+  function monthKeyAdd(key, delta){
+    var parts = key.split("-");
+    var y = parseInt(parts[0],10), m = parseInt(parts[1],10);
+    m += delta;
+    while(m > 12){ m -= 12; y += 1; }
+    while(m < 1){ m += 12; y -= 1; }
+    return y + "-" + String(m).padStart(2,"0");
+  }
+
+  function ensureMonthExists(key){
+    if(db.meses[key]) return;
+    var prevKey = monthKeyAdd(key, -1);
+    if(db.meses[prevKey]){
+      db.meses[key] = cloneMonthCarry(db.meses[prevKey], monthLabelFromKey(key));
+    } else {
+      db.meses[key] = emptyMonth(monthLabelFromKey(key));
+    }
+  }
+
+  function goToMonth(delta){
+    var newKey = monthKeyAdd(activeMonth, delta);
+    ensureMonthExists(newKey);
+    activeMonth = newKey;
+    saveDB();
+    renderAll();
   }
 
   function currentMonthKey(){
     var now = new Date();
     var mm = String(now.getMonth()+1).padStart(2,"0");
     return now.getFullYear() + "-" + mm;
+  }
+
+  function migrateSettings(parsed){
+    if(!parsed.metas) parsed.metas = [];
+    if(!parsed.settings) parsed.settings = {};
+    if(parsed.settings.showChart === undefined) parsed.settings.showChart = true;
+    if(!parsed.settings.visibleSections) parsed.settings.visibleSections = {receitas:true, despesas:true, impostos:true, investimentos:true};
+    if(!parsed.settings.viewMode){
+      // migra o antigo "despesasView" único para o novo formato por seção
+      var legacyMode = parsed.settings.despesasView || "lista";
+      parsed.settings.viewMode = {receitas:"lista", despesas:legacyMode, impostos:"lista", investimentos:"lista"};
+    }
+    delete parsed.settings.despesasView;
+    if(!parsed.categories) parsed.categories = defaultCategoriesState();
+    CATEGORIZABLE.forEach(function(sec){
+      if(!parsed.categories[sec]) parsed.categories[sec] = defaultCategoriesState()[sec];
+    });
+    return parsed;
   }
 
   function loadDB(){
@@ -629,8 +831,7 @@
       if(raw){
         var parsed = JSON.parse(raw);
         if(parsed && parsed.meses && Object.keys(parsed.meses).length){
-          if(!parsed.metas) parsed.metas = [];
-          return parsed;
+          return migrateSettings(parsed);
         }
       }
     }catch(e){ console.warn("Falha ao ler localStorage, recriando dados.", e); }
@@ -638,7 +839,16 @@
     var key = currentMonthKey();
     var meses = {};
     meses[key] = emptyMonth(monthLabelFromKey(key));
-    var db = {meses: meses, metas: []};
+    var db = {
+      meses: meses,
+      metas: [],
+      categories: defaultCategoriesState(),
+      settings: {
+        showChart: true,
+        visibleSections: {receitas:true, despesas:true, impostos:true, investimentos:true},
+        viewMode: {receitas:"lista", despesas:"lista", impostos:"lista", investimentos:"lista"}
+      }
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     return db;
   }
@@ -687,6 +897,13 @@
     return names[m] + "/" + y.slice(2);
   }
 
+  function monthLongLabel(key){
+    var names = ["","Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    var parts = key.split("-");
+    var y = parts[0], m = parseInt(parts[1],10);
+    return names[m] + " " + y;
+  }
+
   function escapeHtml(s){
     return String(s==null ? "" : s).replace(/[&<>"']/g, function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
@@ -702,7 +919,7 @@
   };
 
   var SECTION_DEFAULT_NAME = {
-    receitas:"Receita", despesas:"Despesa", investimentos:"Investimento", dividas:"Dívida"
+    receitas:"Receita", despesas:"Despesa", investimentos:"Investimento", impostos:"Imposto", dividas:"Dívida"
   };
 
   function sumSection(monthData, key){
@@ -728,37 +945,9 @@
 
   /* ---------------- render ---------------- */
 
-  function renderMonthTabs(){
-    var nav = document.getElementById("monthTabs");
-    nav.innerHTML = "";
-    var keys = Object.keys(db.meses).sort();
-    keys.forEach(function(k){
-      var tab = document.createElement("div");
-      tab.className = "month-tab" + (k===activeMonth ? " active": "");
-      var span = document.createElement("span");
-      span.textContent = db.meses[k].label || monthLabelFromKey(k);
-      span.style.cursor = "pointer";
-      span.onclick = function(){ activeMonth = k; renderAll(); };
-      tab.appendChild(span);
-      if(keys.length > 1){
-        var del = document.createElement("button");
-        del.className = "del-month";
-        del.textContent = "✕";
-        del.title = "Excluir mês";
-        del.onclick = function(ev){
-          ev.stopPropagation();
-          if(confirm('Excluir os lançamentos de "' + (db.meses[k].label) + '"? Essa ação não pode ser desfeita.')){
-            delete db.meses[k];
-            if(activeMonth === k){
-              activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
-            }
-            saveDB(); renderAll();
-          }
-        };
-        tab.appendChild(del);
-      }
-      nav.appendChild(tab);
-    });
+  function renderMonthNav(){
+    var label = document.getElementById("monthNavLabel");
+    label.textContent = monthLongLabel(activeMonth);
   }
 
   function pct(realizado, orcado){
@@ -792,6 +981,35 @@
     wrap.innerHTML = html;
   }
 
+  function computeBudgetProgress(monthData){
+    var receitas = sumSection(monthData, "receitas").orcado;
+    var alocado = sumSection(monthData, "despesas").orcado +
+                  sumSection(monthData, "impostos").orcado +
+                  sumSection(monthData, "investimentos").orcado +
+                  sumSection(monthData, "dividas").orcado;
+    return {receitas:receitas, alocado:alocado, falta: receitas - alocado};
+  }
+
+  function renderBudgetProgress(){
+    var wrap = document.getElementById("budgetProgress");
+    var md = db.meses[activeMonth];
+    var b = computeBudgetProgress(md);
+    var p = b.receitas > 0 ? Math.min(100, (b.alocado/b.receitas)*100) : 0;
+    var over = b.falta < 0;
+    var barColor = over ? "var(--despesa-600)" : "var(--brass-500)";
+    var statusColor = over ? "var(--despesa-600)" : "var(--receita-600)";
+    var statusText = over
+      ? ('Orçamento <span class="num">' + brl(Math.abs(b.falta)) + '</span> acima da receita orçada')
+      : ('Falta orçar: <span class="num">' + brl(b.falta) + '</span>');
+
+    wrap.innerHTML =
+      '<div class="sum-eyebrow">Progresso do orçamento</div>' +
+      '<div class="sum-value num" style="margin-top:6px;">' + brl(b.alocado) +
+        ' <span style="font-size:12px; font-weight:500; color:var(--text-600);">orçados de ' + brl(b.receitas) + '</span></div>' +
+      '<div class="progress-track" style="margin-top:10px;"><div class="progress-fill" style="width:' + p.toFixed(0) + '%; background:' + barColor + ';"></div></div>' +
+      '<div class="sum-sub" style="margin-top:9px; font-weight:600; color:' + statusColor + ';">' + statusText + '</div>';
+  }
+
   var TREND_SERIES = [
     {key:"receitas",      label:"Receitas",      color:"var(--receita-600)"},
     {key:"despesas",      label:"Despesas",      color:"var(--despesa-600)"},
@@ -801,6 +1019,14 @@
 
   function renderTrend(){
     var wrap = document.getElementById("trendCard");
+
+    if(db.settings && db.settings.showChart === false){
+      wrap.style.display = "none";
+      wrap.innerHTML = "";
+      return;
+    }
+    wrap.style.display = "";
+
     var keys = Object.keys(db.meses).sort();
 
     var legendHtml = '<div class="trend-legend">' + TREND_SERIES.map(function(s){
@@ -1007,9 +1233,158 @@
   function renderSheets(){
     var wrap = document.getElementById("sheets");
     wrap.innerHTML = "";
+    var viewMode = (db.settings && db.settings.viewMode) || {};
+    var visible = (db.settings && db.settings.visibleSections) || {};
     DASHBOARD_SECTIONS.forEach(function(cfg){
-      wrap.appendChild(renderSection(cfg));
+      if(visible[cfg.key] === false) return;
+      var mode = viewMode[cfg.key] || "lista";
+      if(mode === "categorias" && CATEGORIZABLE.indexOf(cfg.key) !== -1){
+        wrap.appendChild(renderCategoryCards(cfg.key));
+      } else {
+        wrap.appendChild(renderSection(cfg));
+      }
     });
+  }
+
+  function renderCategoryCards(sectionKey){
+    var wrap = document.createElement("div");
+    wrap.className = "cat-cards-wrap";
+    var md = db.meses[activeMonth];
+    var totals = sumByCategory(md, sectionKey);
+
+    getCategories(sectionKey).forEach(function(c){
+      var t = totals[c.key] || {orcado:0, realizado:0};
+      var pct = t.orcado > 0 ? Math.min(100, (t.realizado/t.orcado)*100) : 0;
+      var over = t.orcado > 0 && t.realizado >= t.orcado;
+      var barColor = t.orcado === 0 ? "var(--line-strong)" : (over ? "var(--despesa-600)" : "var(--brass-500)");
+      var detailId = "catDetail-" + sectionKey + "-" + c.key;
+
+      var card = document.createElement("div");
+      card.className = "sheet cat-card";
+      card.innerHTML =
+        '<button class="cat-card-head" data-section="' + sectionKey + '" data-cat="' + c.key + '">' +
+          '<span class="cat-icon">' + categoryIconSvg(c.icon || "outros") + '</span>' +
+          '<span class="cat-label">' + escapeHtml(c.label) + '</span>' +
+          '<span class="cat-value num">' + brl(t.realizado) + '</span>' +
+          '<span class="cat-chevron">›</span>' +
+        '</button>' +
+        '<div class="progress-track cat-progress"><div class="progress-fill" style="width:' + pct.toFixed(0) + '%; background:' + barColor + ';"></div></div>' +
+        '<div class="cat-sub"><span><span class="num">' + brl(t.realizado) + '</span> realizado</span><span>de <span class="num">' + brl(t.orcado) + '</span></span></div>' +
+        '<div class="cat-detail" id="' + detailId + '"></div>';
+      wrap.appendChild(card);
+    });
+
+    wrap.querySelectorAll(".cat-card-head").forEach(function(btn){
+      btn.onclick = function(){
+        var sec = btn.getAttribute("data-section");
+        var key = btn.getAttribute("data-cat");
+        var detailEl = document.getElementById("catDetail-" + sec + "-" + key);
+        var isOpen = detailEl.classList.contains("open");
+        wrap.querySelectorAll(".cat-detail.open").forEach(function(d){ d.classList.remove("open"); d.innerHTML = ""; });
+        wrap.querySelectorAll(".cat-card-head.open").forEach(function(b){ b.classList.remove("open"); });
+        if(!isOpen){
+          detailEl.classList.add("open");
+          btn.classList.add("open");
+          renderCategoryDetail(detailEl, sec, key);
+        }
+      };
+    });
+
+    return wrap;
+  }
+
+  function reopenCategoryDetail(sectionKey, catKey){
+    var detailId = "catDetail-" + sectionKey + "-" + catKey;
+    var detailEl = document.getElementById(detailId);
+    if(!detailEl) return;
+    detailEl.classList.add("open");
+    var head = detailEl.parentElement ? detailEl.parentElement.querySelector(".cat-card-head") : null;
+    if(head) head.classList.add("open");
+    renderCategoryDetail(detailEl, sectionKey, catKey);
+  }
+
+  function renderCategoryDetail(el, sectionKey, catKey){
+    var md = db.meses[activeMonth];
+    var items = (md[sectionKey]||[]).filter(function(it){ return (it.categoria||"outros") === catKey; });
+    var catLabel = categoryLabel(sectionKey, catKey);
+
+    var html = '<table><thead><tr><th>Descrição</th><th class="col-val">Orçado</th><th class="col-val">Realizado</th><th class="col-act"></th></tr></thead><tbody>';
+    if(items.length === 0){
+      html += '<tr class="empty-row"><td colspan="4">Nenhum lançamento nesta categoria ainda.</td></tr>';
+    }
+    html += '</tbody></table><div class="row-add"><button class="btn-add" data-addcat="' + catKey + '">+ adicionar em ' + catLabel.toLowerCase() + '</button></div>';
+    el.innerHTML = html;
+
+    var tbody = el.querySelector("tbody");
+    items.forEach(function(it){
+      var tr = document.createElement("tr");
+
+      var tdNome = document.createElement("td");
+      var inpNome = document.createElement("input");
+      inpNome.className = "cell-input name-input";
+      inpNome.type = "text";
+      inpNome.value = it.nome;
+      inpNome.placeholder = "Descrição";
+      inpNome.addEventListener("change", function(){ it.nome = inpNome.value; saveDB(); });
+      tdNome.appendChild(inpNome);
+      tr.appendChild(tdNome);
+
+      ["orcado","realizado"].forEach(function(f){
+        var td = document.createElement("td");
+        var inp = document.createElement("input");
+        inp.className = "cell-input num";
+        inp.type = "text";
+        inp.inputMode = "decimal";
+        inp.value = it[f] ? it[f].toFixed(2).replace(".", ",") : "";
+        inp.placeholder = "0,00";
+        inp.addEventListener("focus", function(){
+          inp.value = it[f] ? String(it[f]).replace(".", ",") : "";
+          inp.select();
+        });
+        inp.addEventListener("blur", function(){
+          it[f] = parseNum(inp.value);
+          saveDB();
+          renderSummary();
+          renderBudgetProgress();
+          renderTrend();
+          renderSheets();
+          reopenCategoryDetail(sectionKey, catKey);
+        });
+        td.appendChild(inp);
+        tr.appendChild(td);
+      });
+
+      var tdAct = document.createElement("td");
+      tdAct.className = "col-act";
+      var btnDel = document.createElement("button");
+      btnDel.className = "btn-del";
+      btnDel.textContent = "✕";
+      btnDel.title = "Remover lançamento";
+      btnDel.onclick = function(){
+        md[sectionKey] = md[sectionKey].filter(function(x){ return x.id !== it.id; });
+        saveDB();
+        renderAll();
+        reopenCategoryDetail(sectionKey, catKey);
+      };
+      tdAct.appendChild(btnDel);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+
+    var btnAddCat = el.querySelector("[data-addcat]");
+    btnAddCat.onclick = function(){
+      md[sectionKey].push(item("", 0, 0, catKey));
+      saveDB();
+      renderSummary();
+      renderBudgetProgress();
+      renderTrend();
+      renderSheets();
+      reopenCategoryDetail(sectionKey, catKey);
+      var detailNow = document.getElementById("catDetail-" + sectionKey + "-" + catKey);
+      var lastInputs = detailNow ? detailNow.querySelectorAll(".name-input") : [];
+      if(lastInputs.length) lastInputs[lastInputs.length-1].focus();
+    };
   }
 
   function renderDividasView(){
@@ -1118,13 +1493,103 @@
 
   function renderAll(){
     if(!db.meses[activeMonth]) activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
-    renderMonthTabs();
+    renderMonthNav();
     renderSummary();
+    renderBudgetProgress();
     renderTrend();
     renderSheets();
     renderDividasView();
     renderMetas();
     renderConfigMonths();
+    renderDashboardSettings();
+    renderCategoryManager();
+  }
+
+  function renderCategoryManager(){
+    var wrap = document.getElementById("categoryManagerList");
+    if(!wrap) return;
+
+    var html = DASHBOARD_SECTIONS.map(function(cfg){
+      var cats = getCategories(cfg.key);
+      var chips = cats.map(function(c){
+        var protegida = c.key === "outros";
+        return '<span class="cat-chip">' + escapeHtml(c.label) +
+          (protegida ? '' : ' <button class="cat-chip-del" data-section="' + cfg.key + '" data-cat="' + c.key + '" title="Excluir categoria">✕</button>') +
+          '</span>';
+      }).join("");
+      return '<div class="cat-manager-group"><div class="cat-manager-title">' + cfg.title + '</div><div class="cat-manager-chips">' + chips + '</div></div>';
+    }).join("");
+
+    wrap.innerHTML = html;
+
+    wrap.querySelectorAll(".cat-chip-del").forEach(function(btn){
+      btn.onclick = function(){
+        var sec = btn.getAttribute("data-section");
+        var key = btn.getAttribute("data-cat");
+        if(getCategories(sec).length <= 1){
+          alert("Precisa manter pelo menos uma categoria nessa seção.");
+          return;
+        }
+        var label = categoryLabel(sec, key);
+        if(confirm('Excluir a categoria "' + label + '"? Os lançamentos que já estão nela passam a aparecer em "Outros".')){
+          db.categories[sec] = db.categories[sec].filter(function(c){ return c.key !== key; });
+          saveDB();
+          renderCategoryManager();
+          renderSheets();
+        }
+      };
+    });
+  }
+
+  function renderDashboardSettings(){
+    var wrap = document.getElementById("dashboardSettingsList");
+    if(!wrap) return;
+
+    var showChartRow =
+      '<div class="config-row" style="cursor:default;">' +
+        '<div><div class="config-row-title">Gráfico de evolução</div><div class="config-row-sub">Mostrar o gráfico de linhas mensal no Dashboard</div></div>' +
+        '<label class="switch"><input type="checkbox" id="chkShowChart"' + ((db.settings.showChart!==false) ? " checked" : "") + '><span class="switch-slider"></span></label>' +
+      '</div>';
+
+    var rows = DASHBOARD_SECTIONS.map(function(cfg){
+      var visivel = db.settings.visibleSections[cfg.key] !== false;
+      var modo = (db.settings.viewMode && db.settings.viewMode[cfg.key]) || "lista";
+      return '<div class="config-row" style="cursor:default; flex-wrap:wrap;">' +
+        '<div><div class="config-row-title">' + cfg.title + '</div><div class="config-row-sub">Aparece no Dashboard, com opção de organizar por categoria</div></div>' +
+        '<div class="config-row-actions">' +
+          '<select class="cfg-viewmode" data-section="' + cfg.key + '">' +
+            '<option value="lista"' + (modo==="lista"?" selected":"") + '>Lançamentos</option>' +
+            '<option value="categorias"' + (modo==="categorias"?" selected":"") + '>Categorias</option>' +
+          '</select>' +
+          '<label class="switch"><input type="checkbox" class="cfg-visible" data-section="' + cfg.key + '"' + (visivel?" checked":"") + '><span class="switch-slider"></span></label>' +
+        '</div></div>';
+    }).join("");
+
+    wrap.innerHTML = showChartRow + rows;
+
+    document.getElementById("chkShowChart").addEventListener("change", function(e){
+      db.settings.showChart = e.target.checked;
+      saveDB();
+      renderTrend();
+    });
+    wrap.querySelectorAll(".cfg-viewmode").forEach(function(sel){
+      sel.addEventListener("change", function(){
+        var key = sel.getAttribute("data-section");
+        if(!db.settings.viewMode) db.settings.viewMode = {};
+        db.settings.viewMode[key] = sel.value;
+        saveDB();
+        renderSheets();
+      });
+    });
+    wrap.querySelectorAll(".cfg-visible").forEach(function(chk){
+      chk.addEventListener("change", function(){
+        var key = chk.getAttribute("data-section");
+        if(!db.settings.visibleSections) db.settings.visibleSections = {};
+        db.settings.visibleSections[key] = chk.checked;
+        saveDB();
+        renderSheets();
+      });
+    });
   }
 
   /* ---------------- modal: novo mês ---------------- */
@@ -1184,8 +1649,7 @@
       try{
         var parsed = JSON.parse(ev.target.result);
         if(!parsed || !parsed.meses) throw new Error("formato inválido");
-        if(!parsed.metas) parsed.metas = [];
-        db = parsed;
+        db = migrateSettings(parsed);
         activeMonth = Object.keys(db.meses).sort().slice(-1)[0];
         saveDB();
         renderAll();
@@ -1208,21 +1672,30 @@
     document.querySelectorAll(".view").forEach(function(v){
       v.classList.toggle("active", v.id === "view-" + tab);
     });
+    var monthNav = document.getElementById("monthNav");
+    monthNav.style.display = (tab === "dashboard" || tab === "dividas") ? "flex" : "none";
     window.scrollTo({top:0, behavior:"auto"});
   }
   document.querySelectorAll(".nav-item").forEach(function(b){
     b.addEventListener("click", function(){ setActiveTab(b.getAttribute("data-tab")); });
   });
 
+  document.getElementById("prevMonthBtn").onclick = function(){ goToMonth(-1); };
+  document.getElementById("nextMonthBtn").onclick = function(){ goToMonth(1); };
+
   /* ---------------- lançamento rápido (FAB) ---------------- */
 
   var qaOverlay = document.getElementById("quickAddOverlay");
 
-  function toggleQaMetaField(){
+  function toggleQaFields(){
     var tipo = document.getElementById("qaTipo").value;
     var isMeta = tipo === "meta";
+    var hasCategoria = CATEGORIZABLE.indexOf(tipo) !== -1;
     document.getElementById("qaMetaField").style.display = isMeta ? "block" : "none";
     document.getElementById("qaNomeField").style.display = isMeta ? "none" : "block";
+    document.getElementById("qaCategoriaField").style.display = hasCategoria ? "block" : "none";
+    document.getElementById("qaNovaCategoriaField").style.display = "none";
+    if(hasCategoria) populateQaCategoriaSelect(tipo);
   }
 
   function populateQaMetaSelect(){
@@ -1231,11 +1704,19 @@
     sel.innerHTML = metas.map(function(m){ return '<option value="' + m.id + '">' + escapeHtml(m.nome) + '</option>'; }).join("");
   }
 
+  function populateQaCategoriaSelect(tipo){
+    var sel = document.getElementById("qaCategoria");
+    var cats = getCategories(tipo);
+    sel.innerHTML = cats.map(function(c){ return '<option value="' + c.key + '">' + escapeHtml(c.label) + '</option>'; }).join("") +
+      '<option value="__nova__">+ Nova categoria...</option>';
+  }
+
   document.getElementById("btnQuickAdd").onclick = function(){
     document.getElementById("qaTipo").value = "despesas";
     document.getElementById("qaNome").value = "";
     document.getElementById("qaValor").value = "";
-    toggleQaMetaField();
+    document.getElementById("qaNovaCategoriaNome").value = "";
+    toggleQaFields();
     populateQaMetaSelect();
     document.getElementById("qaTipo").querySelector('option[value="meta"]').disabled = (db.metas||[]).length === 0;
     qaOverlay.classList.add("open");
@@ -1243,7 +1724,13 @@
   };
   document.getElementById("btnCancelQA").onclick = function(){ qaOverlay.classList.remove("open"); };
   qaOverlay.addEventListener("click", function(e){ if(e.target === qaOverlay) qaOverlay.classList.remove("open"); });
-  document.getElementById("qaTipo").addEventListener("change", toggleQaMetaField);
+  document.getElementById("qaTipo").addEventListener("change", toggleQaFields);
+  document.getElementById("qaCategoria").addEventListener("change", function(e){
+    document.getElementById("qaNovaCategoriaField").style.display = (e.target.value === "__nova__") ? "block" : "none";
+    if(e.target.value === "__nova__"){
+      setTimeout(function(){ document.getElementById("qaNovaCategoriaNome").focus(); }, 30);
+    }
+  });
 
   document.getElementById("btnConfirmQA").onclick = function(){
     var tipo = document.getElementById("qaTipo").value;
@@ -1261,9 +1748,24 @@
       renderConfigMonths();
       if(m.valorAtual >= m.valorMeta) showToast("Meta concluída! 🎉");
     } else {
+      var categoria = null;
+      if(CATEGORIZABLE.indexOf(tipo) !== -1){
+        var catSel = document.getElementById("qaCategoria").value;
+        if(catSel === "__nova__"){
+          var novoNome = document.getElementById("qaNovaCategoriaNome").value.trim();
+          if(!novoNome){ alert("Digite um nome para a nova categoria."); return; }
+          var novoKey = slugify(novoNome);
+          if(!db.categories[tipo]) db.categories[tipo] = [];
+          var existente = db.categories[tipo].filter(function(c){ return c.key === novoKey; })[0];
+          if(!existente){ db.categories[tipo].push({key:novoKey, label:novoNome, icon:"outros"}); }
+          categoria = novoKey;
+        } else {
+          categoria = catSel;
+        }
+      }
       var nome = document.getElementById("qaNome").value.trim() || SECTION_DEFAULT_NAME[tipo];
       if(!db.meses[activeMonth][tipo]) db.meses[activeMonth][tipo] = [];
-      db.meses[activeMonth][tipo].push(item(nome, 0, valor));
+      db.meses[activeMonth][tipo].push(item(nome, 0, valor, categoria));
       saveDB();
       renderAll();
     }
