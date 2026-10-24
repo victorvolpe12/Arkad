@@ -223,6 +223,14 @@
   .cell-input.num{text-align:right; font-size:13px;}
   .cell-input.name-input{font-weight:500;}
 
+  .cell-select{
+    width:100%; border:none; background:transparent; font-family:inherit;
+    font-size:12.5px; padding:6px 4px; border-radius:4px; color:var(--text-600);
+    cursor:pointer;
+  }
+  .cell-select:focus{outline:none; background:var(--paper-200); color:var(--text-900);}
+  .cell-select:hover{color:var(--text-900);}
+
   .delta{font-size:11px; margin-top:1px;}
   .delta.good{color:var(--receita-600);}
   .delta.bad{color:var(--despesa-600);}
@@ -307,6 +315,51 @@
   /* ---------- metas ---------- */
   .meta-stats{padding:18px 18px 16px;}
   #budgetProgress{padding:18px 18px 16px;}
+  .budget-extra{
+    margin-top:10px; padding:8px 10px; border-radius:6px; font-weight:600;
+    color:var(--receita-600); background:var(--receita-100);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .budget-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .help-btn{
+    width:22px; height:22px; border-radius:50%; flex:none; padding:0;
+    border:1.5px solid var(--brass-500); background:transparent; color:var(--brass-500);
+    font-family:inherit; font-size:12px; font-weight:700; line-height:1;
+    display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .help-btn:hover{background:rgba(184,146,47,0.16);}
+  .budget-extra .help-btn{border-color:var(--receita-600); color:var(--receita-600);}
+
+  /* ---------- fluxo: sugestão de divisão do dinheiro ---------- */
+  .modal.modal-wide{max-width:540px; max-height:88vh; overflow-y:auto;}
+  .flow-intro{font-size:12.5px; color:var(--text-600); margin:-8px 0 14px; line-height:1.5;}
+  .flow-controls{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .flow{display:flex; flex-direction:column; margin-top:2px;}
+  .flow-step{
+    background:var(--paper-100); border:1px solid var(--line); border-radius:8px;
+    padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+  }
+  .flow-name{font-size:13px; font-weight:600;}
+  .flow-hint{font-size:11px; color:var(--text-600); margin-top:2px; line-height:1.35;}
+  .flow-val{font-size:14px; font-weight:700; white-space:nowrap;}
+  .flow-pct{font-size:11px; font-weight:700; color:var(--brass-500); margin-left:7px;}
+  .flow-arrow{text-align:center; color:var(--brass-500); font-size:15px; line-height:1; padding:5px 0;}
+  .flow-step.entrada{background:var(--receita-100); border-color:var(--receita-600);}
+  .flow-step.cofre{border-style:dashed; border-color:var(--despesa-600);}
+  .flow-step.ouro{border-color:var(--brass-500);}
+  .flow-branch{
+    margin-left:12px; padding-left:12px; border-left:2px solid var(--brass-300);
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .flow-empty{padding:18px 6px; text-align:center; color:var(--text-600); font-size:12.5px; font-style:italic;}
+  .flow-note{font-size:11.5px; color:var(--text-600); margin-top:14px; line-height:1.5;}
+  .flow-anim .flow-step, .flow-anim .flow-arrow{opacity:0; animation:flowIn .35s ease forwards; animation-delay:calc(var(--i) * 110ms);}
+  @keyframes flowIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion:reduce){
+    .flow-anim .flow-step, .flow-anim .flow-arrow{animation:none; opacity:1;}
+  }
+  @media (max-width:480px){ .flow-controls{grid-template-columns:1fr;} }
+  .cell-input.over-good{color:var(--receita-600); font-weight:600;}
   .meta-stats-eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--text-600); font-weight:600;}
   .meta-stats-value{font-size:27px; font-weight:700; margin-top:6px;}
   .meta-stats-sub{font-size:12px; color:var(--text-600); margin-top:3px;}
@@ -759,6 +812,32 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="fluxoOverlay">
+    <div class="modal modal-wide">
+      <h3>Como dividir o dinheiro extra</h3>
+      <p class="flow-intro">Uma sugestão de divisão para qualquer entrada. Ela não altera nenhum lançamento, é só um guia.</p>
+      <div class="flow-controls">
+        <div class="field">
+          <label for="fluxoValor">Valor a dividir</label>
+          <input type="text" id="fluxoValor" inputmode="decimal" placeholder="0,00">
+        </div>
+        <div class="field">
+          <label for="fluxoReserva">Reserva de emergência cheia?</label>
+          <select id="fluxoReserva">
+            <option value="nao">Não (retém 10%)</option>
+            <option value="sim">Sim (passa direto)</option>
+          </select>
+        </div>
+      </div>
+      <div class="flow" id="fluxoFlow"></div>
+      <div class="flow-note" id="fluxoNote"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnFluxoReplay">▶ Simular de novo</button>
+        <button class="btn-primary" id="btnCloseFluxo">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Salvo</span></div>
 
 <script>
@@ -1108,7 +1187,9 @@
                   sumSection(monthData, "impostos").orcado +
                   sumSection(monthData, "investimentos").orcado +
                   sumSection(monthData, "dividas").orcado;
-    return {receitas:receitas, alocado:alocado, falta: receitas - alocado};
+    var receitasSum = sumSection(monthData, "receitas");
+    var excedente = Math.max(0, receitasSum.realizado - receitasSum.orcado);
+    return {receitas:receitas, alocado:alocado, falta: receitas - alocado, excedente: excedente};
   }
 
   function renderBudgetProgress(){
@@ -1123,12 +1204,111 @@
       ? ('Orçamento <span class="num">' + brl(Math.abs(b.falta)) + '</span> acima da receita orçada')
       : ('Falta orçar: <span class="num">' + brl(b.falta) + '</span>');
 
+    var helpBtn = '<button type="button" class="help-btn help-fluxo" title="Como dividir o dinheiro" aria-label="Ver sugestão de como dividir o dinheiro">?</button>';
+
     wrap.innerHTML =
-      '<div class="sum-eyebrow">Progresso do orçamento</div>' +
+      '<div class="budget-head"><div class="sum-eyebrow">Progresso do orçamento</div>' + helpBtn + '</div>' +
       '<div class="sum-value num" style="margin-top:6px;">' + brl(b.alocado) +
         ' <span style="font-size:12px; font-weight:500; color:var(--text-600);">orçados de ' + brl(b.receitas) + '</span></div>' +
       '<div class="progress-track" style="margin-top:10px;"><div class="progress-fill" style="width:' + p.toFixed(0) + '%; background:' + barColor + ';"></div></div>' +
-      '<div class="sum-sub" style="margin-top:9px; font-weight:600; color:' + statusColor + ';">' + statusText + '</div>';
+      '<div class="sum-sub" style="margin-top:9px; font-weight:600; color:' + statusColor + ';">' + statusText + '</div>' +
+      (b.excedente > 0
+        ? '<div class="sum-sub budget-extra"><span>Receita acima do orçado: <span class="num">' + brl(b.excedente) + '</span>, a alocar</span>' + helpBtn + '</div>'
+        : '');
+
+    wrap.querySelectorAll(".help-fluxo").forEach(function(btn){
+      btn.onclick = openFluxoModal;
+    });
+  }
+
+  /* ---------------- fluxo: sugestão de divisão do dinheiro ---------------- */
+
+  var FLUXO = {reserva:0.10, sonhos:0.70, ouro:0.30, reinvest:0.50, seguranca:0.30, oportunidades:0.20};
+
+  function computeFluxo(total, reservaCheia){
+    var retencao = reservaCheia ? 0 : total * FLUXO.reserva;
+    var base = total - retencao;
+    var ouro = base * FLUXO.ouro;
+    return {
+      total: total, retencao: retencao, base: base,
+      sonhos: base * FLUXO.sonhos, ouro: ouro,
+      reinvest: ouro * FLUXO.reinvest,
+      seguranca: ouro * FLUXO.seguranca,
+      oportunidades: ouro * FLUXO.oportunidades
+    };
+  }
+
+  // A reserva só conta como "cheia" se existir ao menos uma meta de Emergência e todas estiverem completas
+  function inferReservaCheia(){
+    var emerg = (db.metas||[]).filter(function(m){ return m.tag === "emergencia"; });
+    if(emerg.length === 0) return false;
+    return emerg.every(function(m){ return m.valorMeta > 0 && m.valorAtual >= m.valorMeta; });
+  }
+
+  function pctStr(x){ return Math.round(x * 100) + "%"; }
+
+  function renderFluxo(animate){
+    var wrap = document.getElementById("fluxoFlow");
+    var note = document.getElementById("fluxoNote");
+    var total = parseNum(document.getElementById("fluxoValor").value);
+    var cheia = document.getElementById("fluxoReserva").value === "sim";
+    var temMetaEmerg = (db.metas||[]).some(function(m){ return m.tag === "emergencia"; });
+
+    wrap.className = "flow" + (animate ? " flow-anim" : "");
+
+    if(total <= 0){
+      wrap.innerHTML = '<div class="flow-empty">Digite um valor para ver como dividir.</div>';
+      note.textContent = "";
+      return;
+    }
+
+    var f = computeFluxo(total, cheia);
+    var i = 0;
+    var out = [];
+
+    function step(cls, name, hint, val, pct){
+      out.push('<div class="flow-step ' + cls + '" style="--i:' + (i++) + '"><div>' +
+        '<div class="flow-name">' + name + (pct ? '<span class="flow-pct">' + pct + '</span>' : '') + '</div>' +
+        (hint ? '<div class="flow-hint">' + hint + '</div>' : '') +
+        '</div><div class="flow-val num">' + val + '</div></div>');
+    }
+    function arrow(){ out.push('<div class="flow-arrow" style="--i:' + (i++) + '">↓</div>'); }
+
+    step("entrada", "Entrada", "Valor a dividir", brl(f.total));
+    arrow();
+    step("filtro", "Filtro da reserva",
+      cheia ? "Reserva cheia, o valor passa direto" : "Retém " + pctStr(FLUXO.reserva) + " para completar a reserva",
+      cheia ? "Aprovado" : "Retém " + pctStr(FLUXO.reserva));
+    if(!cheia){
+      arrow();
+      step("cofre", "Reserva (cofre)", "Fica guardado até a reserva de emergência encher", brl(f.retencao));
+    }
+    arrow();
+    step("base", "Fica para distribuir", "", brl(f.base));
+    arrow();
+
+    out.push('<div class="flow-branch">');
+    step("sonhos", "Pote dos Sonhos", "Para metas e o que você quer realizar", brl(f.sonhos), pctStr(FLUXO.sonhos));
+    step("ouro", "Pote de Ouro", "Faz o patrimônio crescer", brl(f.ouro), pctStr(FLUXO.ouro));
+    out.push('<div class="flow-branch">');
+    step("sub", "Reinvestimento", "Reaplicar para render mais", brl(f.reinvest), pctStr(FLUXO.reinvest));
+    step("sub", "Segurança", "Proteção contra imprevistos", brl(f.seguranca), pctStr(FLUXO.seguranca));
+    step("sub", "Novas oportunidades", "Para aproveitar boas chances", brl(f.oportunidades), pctStr(FLUXO.oportunidades));
+    out.push('</div></div>');
+
+    wrap.innerHTML = out.join("");
+
+    note.textContent = (!cheia && !temMetaEmerg)
+      ? 'Dica: crie uma meta de categoria "Emergência" em Metas para acompanhar quando a reserva ficar cheia.'
+      : "Os percentuais são uma sugestão. Ajuste conforme o seu momento.";
+  }
+
+  function openFluxoModal(){
+    var b = computeBudgetProgress(db.meses[activeMonth]);
+    document.getElementById("fluxoValor").value = b.excedente > 0 ? b.excedente.toFixed(2).replace(".", ",") : "";
+    document.getElementById("fluxoReserva").value = inferReservaCheia() ? "sim" : "nao";
+    renderFluxo(true);
+    document.getElementById("fluxoOverlay").classList.add("open");
   }
 
   var TREND_SERIES = [
@@ -1225,9 +1405,9 @@
 
   function fieldsFor(sectionKey){
     if(sectionKey === "dividas"){
-      return {orcadoLabel:"Parcela mês", realizadoLabel:"Pago", hasTotal:true, totalLabel:"Total"};
+      return {orcadoLabel:"Parcela mês", realizadoLabel:"Pago", hasTotal:true, totalLabel:"Total", hasCategoria:false};
     }
-    return {orcadoLabel:"Orçado", realizadoLabel:"Realizado", hasTotal:false};
+    return {orcadoLabel:"Orçado", realizadoLabel:"Realizado", hasTotal:false, hasCategoria: CATEGORIZABLE.indexOf(sectionKey) !== -1};
   }
 
   function renderSection(sectionCfg){
@@ -1235,7 +1415,7 @@
     var arr = md[sectionCfg.key] || [];
     var fLabels = fieldsFor(sectionCfg.key);
     var totals = sumSection(md, sectionCfg.key);
-    var numCols = fLabels.hasTotal ? 5 : 4;
+    var numCols = 2 + (fLabels.hasTotal ? 1 : 0) + (fLabels.hasCategoria ? 1 : 0) + 1;
 
     var box = document.createElement("div");
     box.className = "sheet";
@@ -1257,6 +1437,7 @@
     var table = document.createElement("table");
     var thead = document.createElement("thead");
     thead.innerHTML = '<tr><th>Descrição</th>' +
+      (fLabels.hasCategoria ? '<th>Categoria</th>' : '') +
       (fLabels.hasTotal ? '<th class="col-val">' + fLabels.totalLabel + '</th>' : '') +
       '<th class="col-val">' + fLabels.orcadoLabel + '</th><th class="col-val">' + fLabels.realizadoLabel + '</th><th class="col-act"></th></tr>';
     table.appendChild(thead);
@@ -1286,7 +1467,43 @@
       tdNome.appendChild(inpNome);
       tr.appendChild(tdNome);
 
+      if(fLabels.hasCategoria){
+        var tdCat = document.createElement("td");
+        var selCat = document.createElement("select");
+        selCat.className = "cell-select";
+        var catualAtual = it.categoria || "outros";
+        getCategories(sectionCfg.key).forEach(function(c){
+          var opt = document.createElement("option");
+          opt.value = c.key;
+          opt.textContent = c.label;
+          if(c.key === catualAtual) opt.selected = true;
+          selCat.appendChild(opt);
+        });
+        // se a categoria do item foi excluída, mantém a opção pra não perder o dado
+        if(!getCategories(sectionCfg.key).some(function(c){ return c.key === catualAtual; })){
+          var optOrfa = document.createElement("option");
+          optOrfa.value = catualAtual;
+          optOrfa.textContent = categoryLabel(sectionCfg.key, catualAtual) + " (excluída)";
+          optOrfa.selected = true;
+          selCat.appendChild(optOrfa);
+        }
+        selCat.addEventListener("change", function(){
+          it.categoria = selCat.value;
+          saveDB();
+        });
+        tdCat.appendChild(selCat);
+        tr.appendChild(tdCat);
+      }
+
       var camposNumericos = fLabels.hasTotal ? ["valorTotal","orcado","realizado"] : ["orcado","realizado"];
+      var realizadoInp = null;
+
+      // Receita realizada acima do orçado = bom, então o valor fica em verde
+      function refreshOverClass(){
+        if(!realizadoInp || sectionCfg.key !== "receitas") return;
+        var acima = (Number(it.orcado)||0) > 0 && (Number(it.realizado)||0) > (Number(it.orcado)||0);
+        realizadoInp.classList.toggle("over-good", acima);
+      }
 
       camposNumericos.forEach(function(f){
         var td = document.createElement("td");
@@ -1296,6 +1513,7 @@
         inp.inputMode = "decimal";
         inp.value = it[f] ? it[f].toFixed(2).replace(".", ",") : "";
         inp.placeholder = "0,00";
+        if(f === "realizado") realizadoInp = inp;
         inp.addEventListener("focus", function(){
           inp.value = it[f] ? String(it[f]).replace(".", ",") : "";
           inp.select();
@@ -1305,6 +1523,7 @@
           it[f] = v;
           inp.value = v ? v.toFixed(2).replace(".", ",") : "";
           saveDB();
+          refreshOverClass();
           renderSummary();
           renderBudgetProgress();
           renderTrend();
@@ -1313,6 +1532,7 @@
         td.appendChild(inp);
         tr.appendChild(td);
       });
+      refreshOverClass();
 
       var tdAct = document.createElement("td");
       tdAct.className = "col-act";
@@ -1340,7 +1560,7 @@
     btnAdd.className = "btn-add";
     btnAdd.textContent = "+ adicionar lançamento em " + sectionCfg.title.toLowerCase();
     btnAdd.onclick = function(){
-      var novo = item("", 0, 0);
+      var novo = item("", 0, 0, fLabels.hasCategoria ? "outros" : null);
       if(fLabels.hasTotal) novo.valorTotal = 0;
       md[sectionCfg.key].push(novo);
       saveDB();
@@ -1408,7 +1628,9 @@
       var t = totals[c.key] || {orcado:0, realizado:0};
       var pct = t.orcado > 0 ? Math.min(100, (t.realizado/t.orcado)*100) : 0;
       var over = t.orcado > 0 && t.realizado >= t.orcado;
-      var barColor = t.orcado === 0 ? "var(--line-strong)" : (over ? "var(--despesa-600)" : "var(--brass-500)");
+      // Receita acima do orçado é bom (verde); nas demais seções, estourar o orçado é ruim (vermelho)
+      var overColor = (sectionKey === "receitas") ? "var(--receita-600)" : "var(--despesa-600)";
+      var barColor = t.orcado === 0 ? "var(--line-strong)" : (over ? overColor : "var(--brass-500)");
       var detailId = "catDetail-" + sectionKey + "-" + c.key;
 
       var card = document.createElement("div");
@@ -1489,6 +1711,9 @@
         inp.inputMode = "decimal";
         inp.value = it[f] ? it[f].toFixed(2).replace(".", ",") : "";
         inp.placeholder = "0,00";
+        if(f === "realizado" && sectionKey === "receitas" && (Number(it.orcado)||0) > 0 && (Number(it.realizado)||0) > (Number(it.orcado)||0)){
+          inp.classList.add("over-good");
+        }
         inp.addEventListener("focus", function(){
           inp.value = it[f] ? String(it[f]).replace(".", ",") : "";
           inp.select();
@@ -1999,6 +2224,15 @@
     depositOverlay.classList.remove("open");
     if(m.valorAtual >= m.valorMeta) showToast("Meta concluída! 🎉");
   };
+
+  /* ---------------- fluxo: controles do modal ---------------- */
+
+  var fluxoOverlay = document.getElementById("fluxoOverlay");
+  document.getElementById("btnCloseFluxo").onclick = function(){ fluxoOverlay.classList.remove("open"); };
+  document.getElementById("btnFluxoReplay").onclick = function(){ renderFluxo(true); };
+  fluxoOverlay.addEventListener("click", function(e){ if(e.target === fluxoOverlay) fluxoOverlay.classList.remove("open"); });
+  document.getElementById("fluxoValor").addEventListener("input", function(){ renderFluxo(false); });
+  document.getElementById("fluxoReserva").addEventListener("change", function(){ renderFluxo(true); });
 
   /* ---------------- start ---------------- */
   renderAll();
