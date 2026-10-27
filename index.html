@@ -334,6 +334,9 @@
   .modal.modal-wide{max-width:540px; max-height:88vh; overflow-y:auto;}
   .flow-intro{font-size:12.5px; color:var(--text-600); margin:-8px 0 14px; line-height:1.5;}
   .flow-controls{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .flow-phase{font-size:12.5px; color:var(--text-600); line-height:1.5; margin:-6px 0 14px; padding:10px 12px; background:var(--paper-200); border-radius:8px;}
+  .flow-manual{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:4px;}
+  @media (max-width:480px){ .flow-manual{grid-template-columns:1fr 1fr;} }
   .flow{display:flex; flex-direction:column; margin-top:2px;}
   .flow-step{
     background:var(--paper-100); border:1px solid var(--line); border-radius:8px;
@@ -816,6 +819,23 @@
     <div class="modal modal-wide">
       <h3>Como dividir o dinheiro extra</h3>
       <p class="flow-intro">Uma sugestão de divisão para qualquer entrada. Ela não altera nenhum lançamento, é só um guia.</p>
+      <div class="field">
+        <label for="fluxoCenario">Fase / cenário</label>
+        <select id="fluxoCenario">
+          <option value="acumulacao">Fase de Acumulação (40% Sonhos / 60% Ouro)</option>
+          <option value="consolidacao">Fase de Consolidação (70% Sonhos / 30% Ouro)</option>
+          <option value="distribuicao">Fase de Distribuição (90% Sonhos / 10% Ouro)</option>
+          <option value="manual">Manual (eu escolho)</option>
+        </select>
+      </div>
+      <div class="flow-phase" id="fluxoDesc"></div>
+      <div class="flow-manual" id="fluxoManual" style="display:none">
+        <div class="field"><label for="fluxoMReserva">Reserva %</label><input type="text" id="fluxoMReserva" inputmode="decimal"></div>
+        <div class="field"><label for="fluxoMSonhos">Sonhos % (Ouro = resto)</label><input type="text" id="fluxoMSonhos" inputmode="decimal"></div>
+        <div class="field"><label for="fluxoMReinvest">Reinvestimento %</label><input type="text" id="fluxoMReinvest" inputmode="decimal"></div>
+        <div class="field"><label for="fluxoMSeg">Segurança %</label><input type="text" id="fluxoMSeg" inputmode="decimal"></div>
+        <div class="field"><label for="fluxoMOport">Oportunidades %</label><input type="text" id="fluxoMOport" inputmode="decimal"></div>
+      </div>
       <div class="flow-controls">
         <div class="field">
           <label for="fluxoValor">Valor a dividir</label>
@@ -824,7 +844,7 @@
         <div class="field">
           <label for="fluxoReserva">Reserva de emergência cheia?</label>
           <select id="fluxoReserva">
-            <option value="nao">Não (retém 10%)</option>
+            <option value="nao">Não (retém a reserva)</option>
             <option value="sim">Sim (passa direto)</option>
           </select>
         </div>
@@ -1019,6 +1039,10 @@
     CATEGORIZABLE.forEach(function(sec){
       if(!parsed.categories[sec]) parsed.categories[sec] = defaultCategoriesState()[sec];
     });
+    var fx = parsed.settings.fluxo;
+    if(!fx || typeof fx !== "object") fx = parsed.settings.fluxo = {};
+    if(["acumulacao","consolidacao","distribuicao","manual"].indexOf(fx.cenario) === -1) fx.cenario = "acumulacao";
+    if(!fx.manual || typeof fx.manual !== "object") fx.manual = {reserva:10, sonhos:60, reinvest:50, seguranca:30, oportunidades:20};
     return parsed;
   }
 
@@ -1046,7 +1070,8 @@
       settings: {
         showChart: true,
         visibleSections: {receitas:true, despesas:true, impostos:true, investimentos:true},
-        viewMode: {receitas:"lista", despesas:"lista", impostos:"lista", investimentos:"lista"}
+        viewMode: {receitas:"lista", despesas:"lista", impostos:"lista", investimentos:"lista"},
+        fluxo: {cenario:"acumulacao", manual:{reserva:10, sonhos:60, reinvest:50, seguranca:30, oportunidades:20}}
       }
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
@@ -1223,9 +1248,48 @@
 
   /* ---------------- fluxo: sugestão de divisão do dinheiro ---------------- */
 
-  var FLUXO = {reserva:0.10, sonhos:0.70, ouro:0.30, reinvest:0.50, seguranca:0.30, oportunidades:0.20};
+  var FLUXO_CENARIOS = {
+    acumulacao:{
+      nome:"Fase de Acumulação",
+      desc:"Foco máximo em geração de caixa, reinvestimento agressivo e expansão. É a etapa de maior esforço e sacrifício de consumo presente para acelerar o negócio.",
+      reserva:0.10, sonhos:0.40, reinvest:0.50, seguranca:0.30, oportunidades:0.20
+    },
+    consolidacao:{
+      nome:"Fase de Consolidação",
+      desc:"O patrimônio e as empresas já têm tamanho e tração relevantes. O risco diminui, o conforto pessoal aumenta e o foco é manter o motor girando de forma sustentável.",
+      reserva:0.10, sonhos:0.70, reinvest:0.50, seguranca:0.30, oportunidades:0.20
+    },
+    distribuicao:{
+      nome:"Fase de Distribuição",
+      desc:"O momento de saída ou aposentadoria do risco. Você deixa de reinvestir para crescer e foca em preservar o capital, vivendo dos lucros estabilizados, dividendos ou da venda das empresas. Percentuais sugeridos (ajuste em Manual se preferir).",
+      reserva:0.10, sonhos:0.90, reinvest:0.00, seguranca:0.80, oportunidades:0.20
+    }
+  };
+
+  function clampPct(v, def){
+    var n = parseNum(String(v));
+    if(!isFinite(n) || n < 0) return def;
+    return Math.min(n, 100);
+  }
+
+  // Configuração ativa do fluxo, em frações (0 a 1)
+  function getFluxoCfg(){
+    var fx = db.settings.fluxo;
+    if(fx.cenario !== "manual") return FLUXO_CENARIOS[fx.cenario] || FLUXO_CENARIOS.acumulacao;
+    var m = fx.manual;
+    var r = clampPct(m.reserva, 10), s = clampPct(m.sonhos, 60);
+    var a = clampPct(m.reinvest, 50), b = clampPct(m.seguranca, 30), c = clampPct(m.oportunidades, 20);
+    var soma = a + b + c;
+    if(soma <= 0){ a = 50; b = 30; c = 20; soma = 100; }
+    return {
+      nome:"Manual", desc:"Você define os percentuais. Ouro recebe o que sobra de Sonhos, e as três partes do Ouro são ajustadas para somar 100%.",
+      reserva:r/100, sonhos:s/100, reinvest:a/soma, seguranca:b/soma, oportunidades:c/soma, somaOuro:soma
+    };
+  }
 
   function computeFluxo(total, reservaCheia){
+    var FLUXO = getFluxoCfg();
+    FLUXO = {reserva:FLUXO.reserva, sonhos:FLUXO.sonhos, ouro:1 - FLUXO.sonhos, reinvest:FLUXO.reinvest, seguranca:FLUXO.seguranca, oportunidades:FLUXO.oportunidades};
     var retencao = reservaCheia ? 0 : total * FLUXO.reserva;
     var base = total - retencao;
     var ouro = base * FLUXO.ouro;
@@ -1250,6 +1314,9 @@
   function renderFluxo(animate){
     var wrap = document.getElementById("fluxoFlow");
     var note = document.getElementById("fluxoNote");
+    document.getElementById("fluxoCenario").value = db.settings.fluxo.cenario;
+    document.getElementById("fluxoDesc").textContent = getFluxoCfg().desc;
+    document.getElementById("fluxoManual").style.display = db.settings.fluxo.cenario === "manual" ? "grid" : "none";
     var total = parseNum(document.getElementById("fluxoValor").value);
     var cheia = document.getElementById("fluxoReserva").value === "sim";
     var temMetaEmerg = (db.metas||[]).some(function(m){ return m.tag === "emergencia"; });
@@ -1263,6 +1330,8 @@
     }
 
     var f = computeFluxo(total, cheia);
+    var C = getFluxoCfg();
+    var FLUXO = {reserva:C.reserva, sonhos:C.sonhos, ouro:1 - C.sonhos, reinvest:C.reinvest, seguranca:C.seguranca, oportunidades:C.oportunidades};
     var i = 0;
     var out = [];
 
@@ -1301,12 +1370,23 @@
     note.textContent = (!cheia && !temMetaEmerg)
       ? 'Dica: crie uma meta de categoria "Emergência" em Metas para acompanhar quando a reserva ficar cheia.'
       : "Os percentuais são uma sugestão. Ajuste conforme o seu momento.";
+    if(C.somaOuro && Math.abs(C.somaOuro - 100) > 0.01){
+      note.textContent += " As três partes do Ouro somavam " + C.somaOuro.toFixed(0) + "% e foram proporcionalizadas para 100%.";
+    }
+  }
+
+  function syncManualInputs(){
+    var m = db.settings.fluxo.manual;
+    [["fluxoMReserva","reserva"],["fluxoMSonhos","sonhos"],["fluxoMReinvest","reinvest"],["fluxoMSeg","seguranca"],["fluxoMOport","oportunidades"]].forEach(function(p){
+      document.getElementById(p[0]).value = String(m[p[1]]).replace(".", ",");
+    });
   }
 
   function openFluxoModal(){
     var b = computeBudgetProgress(db.meses[activeMonth]);
     document.getElementById("fluxoValor").value = b.excedente > 0 ? b.excedente.toFixed(2).replace(".", ",") : "";
     document.getElementById("fluxoReserva").value = inferReservaCheia() ? "sim" : "nao";
+    syncManualInputs();
     renderFluxo(true);
     document.getElementById("fluxoOverlay").classList.add("open");
   }
@@ -1407,7 +1487,7 @@
     if(sectionKey === "dividas"){
       return {orcadoLabel:"Parcela mês", realizadoLabel:"Pago", hasTotal:true, totalLabel:"Total", hasCategoria:false};
     }
-    return {orcadoLabel:"Orçado", realizadoLabel:"Realizado", hasTotal:false, hasCategoria: CATEGORIZABLE.indexOf(sectionKey) !== -1};
+    return {orcadoLabel:"Orçado", realizadoLabel:"Realizado", hasTotal:false, hasCategoria: CATEGORIZABLE.indexOf(sectionKey) !== -1, showCatCol:false};
   }
 
   function renderSection(sectionCfg){
@@ -1415,7 +1495,7 @@
     var arr = md[sectionCfg.key] || [];
     var fLabels = fieldsFor(sectionCfg.key);
     var totals = sumSection(md, sectionCfg.key);
-    var numCols = 2 + (fLabels.hasTotal ? 1 : 0) + (fLabels.hasCategoria ? 1 : 0) + 1;
+    var numCols = 2 + (fLabels.hasTotal ? 1 : 0) + (fLabels.showCatCol ? 1 : 0) + 1;
 
     var box = document.createElement("div");
     box.className = "sheet";
@@ -1437,7 +1517,7 @@
     var table = document.createElement("table");
     var thead = document.createElement("thead");
     thead.innerHTML = '<tr><th>Descrição</th>' +
-      (fLabels.hasCategoria ? '<th>Categoria</th>' : '') +
+      (fLabels.showCatCol ? '<th>Categoria</th>' : '') +
       (fLabels.hasTotal ? '<th class="col-val">' + fLabels.totalLabel + '</th>' : '') +
       '<th class="col-val">' + fLabels.orcadoLabel + '</th><th class="col-val">' + fLabels.realizadoLabel + '</th><th class="col-act"></th></tr>';
     table.appendChild(thead);
@@ -1467,7 +1547,7 @@
       tdNome.appendChild(inpNome);
       tr.appendChild(tdNome);
 
-      if(fLabels.hasCategoria){
+      if(fLabels.showCatCol){
         var tdCat = document.createElement("td");
         var selCat = document.createElement("select");
         selCat.className = "cell-select";
@@ -2233,6 +2313,18 @@
   fluxoOverlay.addEventListener("click", function(e){ if(e.target === fluxoOverlay) fluxoOverlay.classList.remove("open"); });
   document.getElementById("fluxoValor").addEventListener("input", function(){ renderFluxo(false); });
   document.getElementById("fluxoReserva").addEventListener("change", function(){ renderFluxo(true); });
+  document.getElementById("fluxoCenario").addEventListener("change", function(e){
+    db.settings.fluxo.cenario = e.target.value;
+    saveDB();
+    renderFluxo(true);
+  });
+  [["fluxoMReserva","reserva"],["fluxoMSonhos","sonhos"],["fluxoMReinvest","reinvest"],["fluxoMSeg","seguranca"],["fluxoMOport","oportunidades"]].forEach(function(p){
+    document.getElementById(p[0]).addEventListener("input", function(e){
+      db.settings.fluxo.manual[p[1]] = clampPct(e.target.value, 0);
+      saveDB();
+      renderFluxo(false);
+    });
+  });
 
   /* ---------------- start ---------------- */
   renderAll();
