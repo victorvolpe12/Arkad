@@ -185,14 +185,22 @@
   }
   .sheet-head{
     display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:6px 14px;
     padding:14px 18px; border-bottom:1px solid var(--line-strong);
     background:linear-gradient(180deg, rgba(184,146,47,0.07), transparent);
   }
-  .sheet-head h2{font-size:16.5px; font-weight:600; letter-spacing:0.2px;}
+  .sheet-head h2{font-size:16.5px; font-weight:600; letter-spacing:0.2px; white-space:nowrap;}
   .sheet-head .tag{
     font-size:10px; text-transform:uppercase; letter-spacing:1.2px; font-weight:700;
-    padding:3px 8px; border-radius:20px; margin-left:9px; vertical-align:middle;
+    padding:3px 8px; border-radius:20px; margin-left:9px; vertical-align:middle; white-space:nowrap; display:inline-block;
   }
+  .goal-history{margin:0 0 12px; font-size:12px;}
+  .goal-history summary{cursor:pointer; color:var(--text-600); font-weight:600; padding:2px 0;}
+  .goal-history ul{list-style:none; margin:8px 0 0; padding:0; max-height:180px; overflow-y:auto;}
+  .goal-history li{display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-top:1px solid var(--line-strong);}
+  .goal-history .gh-d{color:var(--text-600); font-size:11px; display:block;}
+  .goal-history .gh-in{color:var(--receita-600); font-weight:700; white-space:nowrap;}
+  .goal-history .gh-out{color:var(--despesa-600); font-weight:700; white-space:nowrap;}
   .receitas-tag{background:var(--receita-100); color:var(--receita-600);}
   .despesas-tag{background:var(--despesa-100); color:var(--despesa-600);}
   .impostos-tag{background:var(--despesa-100); color:var(--despesa-600);}
@@ -392,6 +400,14 @@
     padding:12px; border-radius:8px; font-size:13.5px; font-weight:700;
   }
   .goal-deposit-btn:hover{background:#255c3f;}
+  .goal-actions{display:flex; gap:8px;}
+  .goal-actions .goal-deposit-btn{flex:1; width:auto;}
+  .goal-withdraw-btn{
+    background:transparent; color:var(--despesa-600); border:1.5px solid var(--despesa-600);
+    padding:12px 16px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .goal-withdraw-btn:disabled{opacity:.4; cursor:not-allowed;}
+  .withdraw-hint{font-size:11.5px; color:var(--text-600); line-height:1.5; margin:-6px 0 14px;}
 
   /* ---------- config ---------- */
   .config-list{padding:2px 0;}
@@ -811,6 +827,29 @@
       <div class="modal-actions">
         <button class="btn-secondary" id="btnCancelDeposit">Cancelar</button>
         <button class="btn-primary" id="btnConfirmDeposit">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="withdrawOverlay">
+    <div class="modal">
+      <h3>Retirar da meta</h3>
+      <p id="withdrawGoalName" style="font-size:13px; color:var(--text-600); margin:-8px 0 14px;"></p>
+      <div class="field">
+        <label for="withdrawValor">Valor da retirada</label>
+        <input type="text" id="withdrawValor" inputmode="decimal" placeholder="0,00">
+      </div>
+      <div class="field">
+        <label for="withdrawMotivo">Motivo (opcional)</label>
+        <input type="text" id="withdrawMotivo" placeholder="Ex.: conserto do carro">
+      </div>
+      <label class="field-check" style="margin-bottom:6px;">
+        <input type="checkbox" id="withdrawDespesa"> Também lançar como despesa deste mês
+      </label>
+      <p class="withdraw-hint">Marque só se o dinheiro foi gasto de fato. A retirada em si não é despesa: ela apenas reduz o saldo da meta.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelWithdraw">Cancelar</button>
+        <button class="btn-primary" id="btnConfirmWithdraw">Retirar</button>
       </div>
     </div>
   </div>
@@ -1850,6 +1889,19 @@
     wrap.appendChild(renderSection(DIVIDAS_SECTION));
   }
 
+  function historyHtml(m){
+    var deps = (m.deposits || []).slice().reverse();
+    if(!deps.length) return "";
+    var lis = deps.map(function(d){
+      var v = Number(d.valor) || 0;
+      var dt = d.data ? new Date(d.data).toLocaleDateString("pt-BR") : "";
+      var label = v < 0 ? (d.motivo ? escapeHtml(d.motivo) : "Retirada") : "Depósito";
+      return '<li><span>' + label + '<span class="gh-d">' + dt + '</span></span>' +
+        '<span class="num ' + (v < 0 ? "gh-out" : "gh-in") + '">' + (v < 0 ? "− " : "+ ") + brl(Math.abs(v)) + '</span></li>';
+    }).join("");
+    return '<details class="goal-history"><summary>Histórico (' + deps.length + ')</summary><ul>' + lis + '</ul></details>';
+  }
+
   function renderMetas(){
     var wrap = document.getElementById("view-metas");
     if(!wrap) return;
@@ -1899,7 +1951,11 @@
             '<div><div class="mini-label">Valor Atual</div><div class="goal-atual num">' + brl(m.valorAtual) + '</div><div class="mini-label">Meta: <span class="num">' + brl(m.valorMeta) + '</span></div></div>' +
             '<div class="goal-faltam-box"><div class="mini-label">Faltam</div><div class="num">' + brl(faltam) + '</div></div>' +
           '</div>' +
-          '<button class="goal-deposit-btn" data-goal="' + m.id + '">+ Adicionar Depósito</button>' +
+          historyHtml(m) +
+          '<div class="goal-actions">' +
+            '<button class="goal-deposit-btn" data-goal="' + m.id + '">+ Adicionar Depósito</button>' +
+            '<button class="goal-withdraw-btn" data-goal="' + m.id + '"' + (m.valorAtual > 0 ? '' : ' disabled') + '>Retirar</button>' +
+          '</div>' +
         '</div>';
       });
       html += '</div>';
@@ -1914,6 +1970,9 @@
     });
     wrap.querySelectorAll(".goal-deposit-btn").forEach(function(btn){
       btn.onclick = function(){ openDepositModal(btn.getAttribute("data-goal")); };
+    });
+    wrap.querySelectorAll(".goal-withdraw-btn").forEach(function(btn){
+      btn.onclick = function(){ openWithdrawModal(btn.getAttribute("data-goal")); };
     });
   }
 
@@ -2303,6 +2362,44 @@
     renderMetas();
     depositOverlay.classList.remove("open");
     if(m.valorAtual >= m.valorMeta) showToast("Meta concluída! 🎉");
+  };
+
+  /* ---------------- retirada de meta ---------------- */
+
+  var withdrawOverlay = document.getElementById("withdrawOverlay");
+  var withdrawTargetId = null;
+
+  function openWithdrawModal(id){
+    var m = (db.metas||[]).filter(function(x){ return x.id === id; })[0];
+    if(!m) return;
+    withdrawTargetId = id;
+    document.getElementById("withdrawGoalName").textContent = m.nome + " · saldo " + brl(m.valorAtual);
+    document.getElementById("withdrawValor").value = "";
+    document.getElementById("withdrawMotivo").value = "";
+    document.getElementById("withdrawDespesa").checked = false;
+    withdrawOverlay.classList.add("open");
+    setTimeout(function(){ document.getElementById("withdrawValor").focus(); }, 60);
+  }
+  document.getElementById("btnCancelWithdraw").onclick = function(){ withdrawOverlay.classList.remove("open"); };
+  withdrawOverlay.addEventListener("click", function(e){ if(e.target === withdrawOverlay) withdrawOverlay.classList.remove("open"); });
+
+  document.getElementById("btnConfirmWithdraw").onclick = function(){
+    var valor = parseNum(document.getElementById("withdrawValor").value);
+    if(valor <= 0){ alert("Informe um valor maior que zero."); return; }
+    var m = (db.metas||[]).filter(function(x){ return x.id === withdrawTargetId; })[0];
+    if(!m) return;
+    if(valor > m.valorAtual){ alert("A retirada não pode ser maior que o saldo da meta (" + brl(m.valorAtual) + ")."); return; }
+    var motivo = document.getElementById("withdrawMotivo").value.trim();
+    m.valorAtual -= valor;
+    m.deposits.push({id:uid("dep"), valor:-valor, data:new Date().toISOString(), motivo:motivo});
+    if(document.getElementById("withdrawDespesa").checked){
+      var md = db.meses[activeMonth];
+      md.despesas.push(item(motivo || ("Retirada: " + m.nome), 0, valor, "outros"));
+    }
+    saveDB();
+    withdrawOverlay.classList.remove("open");
+    renderAll();
+    showToast("Retirada registrada");
   };
 
   /* ---------------- fluxo: controles do modal ---------------- */
